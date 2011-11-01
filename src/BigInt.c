@@ -167,12 +167,24 @@ int compareBigInt(BigInteger a, BigInteger b)
 BigInteger newBigInteger(char* str)
 {
 	char tmp[NBDIGITS + 1];
-	int length = 0, l = 0, r = 0, c = 0, i = 0;
+	int length = 0,l = 0, r = 0, c = 0, i = 0;
 	BigInteger b = NULL;
 	b = create_big_int();
 
 	if(!is_empty(b))
 	{
+		/* Take into account the sign of the big integer */
+		if(!isdigit(str[0]))
+		{
+			if(str[0] == '-')
+				b->sign = -1;
+			else if(str[0] == '+')
+				b->sign = 1;
+			str = &str[1]; /* Gap of the sign */
+		}
+		else
+			b->sign = 1;
+
 		length = strlen(str);
 		r = length % NBDIGITS; /* Rest of the length */
 		l = length - r; /* New string length multiple of NBDIGITS */
@@ -195,7 +207,6 @@ BigInteger newBigInteger(char* str)
 			c = atoi(tmp);
 			b->l = insert_head(b->l, (void*)c);
 		}
-		b->sign = 1;
 	}
 
 	return b;
