@@ -1,0 +1,10 @@
+Autor: Tao S.
+License: Beerware
+Date: 11/01/11
+
+This is an instance of implementation of big integers.
+Programed in C-language, this project use a double linked list datatype.
+
+It's a school-project from the UTBM.
+See constraints in "LO21-LO27-project-A2011-en.pdf" file.
+
