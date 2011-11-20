@@ -40,11 +40,11 @@ void delete_list(DList l)
 	{
 		p = l->head;
 		/* While we haven't reached the end of the list */
-		while(!is_empty(p->next))
+		while(!is_empty(p))
 		{
 			tmp = p; /* We save the current element into the buffer */
 			p = p->next; /* We switch to the next element */
-			free(tmp); /* And we free the buffer */
+            free(tmp); /* And we free the buffer */
 			tmp = NULL;
 		}
 		free(l); /* Finally we free the record of the list */

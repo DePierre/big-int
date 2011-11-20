@@ -27,11 +27,15 @@ typedef Struct_big_integer* BigInteger;
 BigInteger create_big_int(void);
 void delete_big_int(BigInteger b);
 /* Access methods */
-inline Boolean isNull(BigInteger b);
-inline Boolean signBigInt(BigInteger b);
+Boolean isNull(BigInteger b);
+int signBigInt(BigInteger b);
 Boolean equalsBigInt(BigInteger a, BigInteger b);
 int compareBigInt(BigInteger a, BigInteger b);
+BigInteger sumBigInt(BigInteger a, BigInteger b);
 /* Modifiers */
 BigInteger newBigInteger(char* str);
+/* Debug */
+void printBigInteger(BigInteger b);
 
 #endif
+

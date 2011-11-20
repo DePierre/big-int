@@ -34,19 +34,19 @@ BigInteger create_big_int(void)
 void delete_big_int(BigInteger b)
 {
 	delete_list(b->l);
-	free(b);
+    free(b);
 	b = NULL;
 }
 
 /* Access methods */
-inline Boolean isNull(BigInteger b)
+Boolean isNull(BigInteger b)
 {
 	return is_empty(b);
 }
 
-inline Boolean signBigInt(BigInteger b)
+int signBigInt(BigInteger b)
 {
-	return (is_empty(b->l)) ? 0 : (b->sign == 1) ? 1 : -1;
+	return (is_empty(b->l)) ? 0 : (b->sign == 1) ? 1 : (b->sign == 0) ? 0 : -1;
 }
 
 /*  Result: true if a == b, false otherwise
@@ -160,6 +160,64 @@ int compareBigInt(BigInteger a, BigInteger b)
 	return 0;
 }
 
+BigInteger sumBigInt(BigInteger a, BigInteger b)
+{
+    int currentSum = 0, i = 0, min = 0, max = 0, r = 0;
+    int pow = power(10, NBDIGITS-1); /* Each number can't be greater than 10,000 */
+    BigInteger sum = create_big_int();
+    Element *currentA = NULL, *currentB = NULL, *last = NULL;
+
+    if(!is_empty(a) && !is_empty(b))
+    {
+        /* We compute the minimum number of loop to reach the end of the smallest big integer */
+        if(a->l->length <= b->l->length)
+        {
+            min = a->l->length;
+            max = b->l->length;
+        }
+        else
+        {
+            min = b->l->length;
+            max = a->l->length;
+        }
+        currentA = a->l->tail;
+        currentB = b->l->tail;
+
+        for(i = 0; i < min; i = i + 1)
+        {
+            /* We sum both numbers */
+            currentSum = (int)currentA->d + (int)currentB->d + r;
+            /* We switch to the next elements */
+            currentA = currentA->prev;
+            currentB = currentB->prev;
+
+            /* We save the deduction */
+            r = currentSum / pow;
+            /* We cast currentSum to a number with maximum 4 digits */
+            currentSum = currentSum % pow;
+            /* We insert the result into the new big int */
+            sum->l = insert_head(sum->l, (void*)currentSum);
+        }
+        /* We save the position in the greatest big integer */
+        last = (i == a->l->length) ? currentB : currentA;
+        /* And we summ the rest of it */
+        for(i = min; i < max; i = i + 1)
+        {
+            currentSum = (int)last->d + r;
+            last = last->prev;
+
+            r = currentSum / pow;
+            currentSum = currentSum % pow;
+            sum->l = insert_head(sum->l, (void*)currentSum);
+        }
+        /* If the deduction is not equal to zero we add it */
+        if(r != 0)
+            sum->l = insert_head(sum->l, (void*)r);
+    }
+
+    return sum;
+}
+
 /* Modifiers */
 /*  Result: new big integer
 	Data: number as a string
@@ -167,7 +225,7 @@ int compareBigInt(BigInteger a, BigInteger b)
 BigInteger newBigInteger(char* str)
 {
 	char tmp[NBDIGITS + 1];
-	int length = 0,l = 0, r = 0, c = 0, i = 0;
+	int length = 0, l = 0, r = 0, c = 0, i = 0;
 	BigInteger b = NULL;
 	b = create_big_int();
 
@@ -211,3 +269,26 @@ BigInteger newBigInteger(char* str)
 
 	return b;
 }
+
+/* Debug */
+void printBigInteger(BigInteger b)
+{
+    Element *current = NULL;
+    int i = 0;
+
+    if(is_empty(b) || is_empty(b->l))
+        printf("The Big-Integer is empty!\n");
+    else
+    {
+        if(b->sign == -1)
+            printf("-");
+        current = b->l->head;
+        for(i = b->l->length; i > 0; i = i - 1)
+        {
+            printf("%.4d ", current->d);
+            current = current->next;
+        }
+        printf("\n");
+    }
+}
+

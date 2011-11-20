@@ -17,7 +17,8 @@ typedef unsigned int Boolean;
 /*  Result: boolean
 	Data: data to test
 	Process: test if the data is empty (i.e NULL) */
-inline Boolean is_empty(void* d);
+Boolean is_empty(void* d);
+int power(int n, int p);
 
 #endif
 
