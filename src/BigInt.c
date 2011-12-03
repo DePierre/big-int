@@ -160,15 +160,25 @@ int compareBigInt(BigInteger a, BigInteger b)
 	return 0;
 }
 
+/* Arithmetic expression */
+/*  Return: new big integer which is the sum of a and b
+    Data: two big integers to sum
+    Process: sum each element from both big integers */
 BigInteger sumBigInt(BigInteger a, BigInteger b)
 {
     int currentSum = 0, i = 0, min = 0, max = 0, r = 0;
-    int pow = power(10, NBDIGITS-1); /* Each number can't be greater than 10,000 */
     BigInteger sum = create_big_int();
-    Element *currentA = NULL, *currentB = NULL, *last = NULL;
+    Element *currentA = NULL, *currentB = NULL, *rest = NULL;
 
     if(!is_empty(a) && !is_empty(b))
     {
+        /* -a + b <=> b - a */
+        if(a->sign == -1 && b->sign == 1)
+            return diffBigInt(b, a);
+        /* a + (-b) <=> a - b */
+        else if(a->sign == 1 && b->sign == -1)
+            return diffBigInt(a, b);
+
         /* We compute the minimum number of loop to reach the end of the smallest big integer */
         if(a->l->length <= b->l->length)
         {
@@ -192,22 +202,22 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
             currentB = currentB->prev;
 
             /* We save the deduction */
-            r = currentSum / pow;
+            r = currentSum / NBDIGITSPOW;
             /* We cast currentSum to a number with maximum 4 digits */
-            currentSum = currentSum % pow;
+            currentSum = currentSum % NBDIGITSPOW;
             /* We insert the result into the new big int */
             sum->l = insert_head(sum->l, (void*)currentSum);
         }
         /* We save the position in the greatest big integer */
-        last = (i == a->l->length) ? currentB : currentA;
+        rest = (i == a->l->length) ? currentB : currentA;
         /* And we summ the rest of it */
         for(i = min; i < max; i = i + 1)
         {
-            currentSum = (int)last->d + r;
-            last = last->prev;
+            currentSum = (int)rest->d + r;
+            rest = rest->prev;
 
-            r = currentSum / pow;
-            currentSum = currentSum % pow;
+            r = currentSum / NBDIGITSPOW;
+            currentSum = currentSum % NBDIGITSPOW;
             sum->l = insert_head(sum->l, (void*)currentSum);
         }
         /* If the deduction is not equal to zero we add it */
@@ -215,7 +225,84 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
             sum->l = insert_head(sum->l, (void*)r);
     }
 
+
     return sum;
+}
+
+BigInteger diffBigInt(BigInteger a, BigInteger b)
+{
+    int currentDiff = 0, i = 0, min = 0, max = 0, r = 0;
+    BigInteger diff = create_big_int();
+    Element *currentA = NULL, *currentB = NULL, *rest = NULL;
+    int test = 0;
+
+    if((!is_empty(a) && !is_empty(b))
+        && (!is_empty(a->l) && !is_empty(b->l)))
+    {
+        /* We find the greatest element and the lowest one*/
+        if(a->l->length > b->l->length)
+        {
+            min = b->l->length;
+            max = a->l->length;
+            diff->sign = 1;
+        }
+        else
+        {
+            min = a->l->length;
+            max = b->l->length;
+            diff->sign = -1;
+        }
+
+        currentA = a->l->tail;
+        currentB = b->l->tail;
+        /* There are at least min loops to diff each elements */
+        for(i = 0; i < min; i = i + 1)
+        {
+            if(a->l->length >= b->l->length)
+            {
+                printf("r = %d\n", r);
+                currentDiff = (int)currentA->d - ((int)currentB->d + r);
+                if(currentDiff < 0)
+                {
+                    currentDiff = NBDIGITSPOW + currentDiff;
+                    r = 1;
+                }
+                else
+                    r = 0;
+                printf("Cas 1 : %d = %d - %d\n", currentDiff, currentA->d, ((int)currentB->d + r));
+            }
+            else if(a->l->length < b->l->length)
+            {
+                printf("r = %d\n", r);
+                currentDiff = -((int)currentB->d + r) - ((int)currentA->d);
+                if(currentDiff < 0)
+                {
+                    currentDiff = NBDIGITSPOW + currentDiff;
+                    r = 1;
+                }
+                else
+                    r = 0;
+                printf("Cas 2 : %d = %d - %d\n", currentDiff, ((int)currentB->d + r), ((int)currentA->d));
+            }
+            currentA = currentA->prev;
+            currentB = currentB->prev;
+
+            diff->l = insert_head(diff->l, (void*)currentDiff);
+        }
+        /* There are (max - min) loops to do to diff the rest
+        of the lowest big-int */
+        rest = (i == a->l->length) ? currentB : currentA;
+        for(i = min; i < max; i = i + 1)
+        {
+            currentDiff = (int)rest->d - r;
+            rest = rest->prev;
+            r = 0;
+            diff->l = insert_head(diff->l, (void*)currentDiff);
+        }
+        printf("DEBUG\n");
+    }
+
+    return diff;
 }
 
 /* Modifiers */

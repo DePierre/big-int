@@ -2,9 +2,9 @@
 
 int main(void)
 {
-    BigInteger bigInt1 = newBigInteger("1");
-    BigInteger bigInt2 = newBigInteger("123456789");
-    BigInteger sum = NULL;
+    BigInteger bigInt2 = newBigInteger("2000000000000");
+    BigInteger bigInt1 = newBigInteger("999999999999");
+    BigInteger sum = NULL, diff = NULL;
     int test = 0;
 
     printf("Hello world!\n");
@@ -23,9 +23,14 @@ int main(void)
     printf("a + b = ");
     printBigInteger(sum);
 
+    diff = diffBigInt(bigInt1, bigInt2);
+    printf("a - b = ");
+    printBigInteger(diff);
+
     delete_big_int(bigInt1);
     delete_big_int(bigInt2);
     delete_big_int(sum);
+    delete_big_int(diff);
     return 0;
 }
 
