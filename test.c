@@ -2,8 +2,8 @@
 
 int main(void)
 {
-    BigInteger bigInt2 = newBigInteger("2000000000000");
-    BigInteger bigInt1 = newBigInteger("999999999999");
+    BigInteger bigInt1 = newBigInteger("2000000000000");
+    BigInteger bigInt2 = newBigInteger("999999999999");
     BigInteger sum = NULL, diff = NULL;
     int test = 0;
 

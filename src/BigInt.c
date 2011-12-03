@@ -231,10 +231,9 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
 
 BigInteger diffBigInt(BigInteger a, BigInteger b)
 {
-    int currentDiff = 0, i = 0, min = 0, max = 0, r = 0;
+    int currentDiff = 0, i = 0, min = 0, max = 0, r = 0, sign = 1;
     BigInteger diff = create_big_int();
     Element *currentA = NULL, *currentB = NULL, *rest = NULL;
-    int test = 0;
 
     if((!is_empty(a) && !is_empty(b))
         && (!is_empty(a->l) && !is_empty(b->l)))
@@ -258,32 +257,17 @@ BigInteger diffBigInt(BigInteger a, BigInteger b)
         /* There are at least min loops to diff each elements */
         for(i = 0; i < min; i = i + 1)
         {
-            if(a->l->length >= b->l->length)
+            sign = (a->l->length >= b->l->length) ? 1 : -1;
+            printf("r = %d\n", r);
+            currentDiff = (sign)*(int)currentA->d - ((int)currentB->d + r);
+            if(currentDiff < 0)
             {
-                printf("r = %d\n", r);
-                currentDiff = (int)currentA->d - ((int)currentB->d + r);
-                if(currentDiff < 0)
-                {
-                    currentDiff = NBDIGITSPOW + currentDiff;
-                    r = 1;
-                }
-                else
-                    r = 0;
-                printf("Cas 1 : %d = %d - %d\n", currentDiff, currentA->d, ((int)currentB->d + r));
+                currentDiff = NBDIGITSPOW + currentDiff;
+                r = 1;
             }
-            else if(a->l->length < b->l->length)
-            {
-                printf("r = %d\n", r);
-                currentDiff = -((int)currentB->d + r) - ((int)currentA->d);
-                if(currentDiff < 0)
-                {
-                    currentDiff = NBDIGITSPOW + currentDiff;
-                    r = 1;
-                }
-                else
-                    r = 0;
-                printf("Cas 2 : %d = %d - %d\n", currentDiff, ((int)currentB->d + r), ((int)currentA->d));
-            }
+            else
+                r = 0;
+            printf("Cas 1 : %d = %d - %d\n", currentDiff, currentA->d, ((int)currentB->d + r));
             currentA = currentA->prev;
             currentB = currentB->prev;
 
