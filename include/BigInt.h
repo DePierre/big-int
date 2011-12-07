@@ -7,12 +7,14 @@
 #ifndef DEF_BIGINT
 #define DEF_BIGINT
 
-#define NBDIGITS 4 /* Number of digits by each element */
-
 #include <stdlib.h>
 #include <string.h>
-#include "utils.h"
-#include "DList.h"
+#include <utils.h>
+#include <DList.h>
+
+#define NBDIGITS 4 /* Number of digits by each element */
+/* Each number can't be greater than 10,00 */
+#define NBDIGITSPOW (int)pow(10, NBDIGITS)
 
 /* Record of a big integer */
 typedef struct
@@ -31,7 +33,9 @@ Boolean isNull(BigInteger b);
 int signBigInt(BigInteger b);
 Boolean equalsBigInt(BigInteger a, BigInteger b);
 int compareBigInt(BigInteger a, BigInteger b);
+/* Arithmetic methods */
 BigInteger sumBigInt(BigInteger a, BigInteger b);
+BigInteger diffBigInt(BigInteger a, BigInteger b);
 /* Modifiers */
 BigInteger newBigInteger(char* str);
 /* Debug */

@@ -5,14 +5,14 @@
 */
 
 #include <stdlib.h>
-#include <stdio.h>/* Debug only */
-#include "../include/utils.h"
-#include "../include/DList.h"
+#include <stdio.h> /* Debug only */
+#include <utils.h>
+#include <DList.h>
 
 /* Creator & destructor */
 /*  Return: empty double linked list
 	Data: nothing
-	Process: Allocate a new DList element and initialize it */
+	Process: allocate a new DList element and initialize it */
 DList create_list(void)
 {
 	DList l = NULL;

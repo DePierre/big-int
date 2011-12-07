@@ -5,9 +5,9 @@
 */
 
 #include <stdlib.h>
-#include "../include/utils.h"
-#include "../include/DList.h"
-#include "../include/BigInt.h"
+#include <utils.h>
+#include <DList.h>
+#include <BigInt.h>
 
 
 /* Creator & destructor */

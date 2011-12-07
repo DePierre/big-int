@@ -1,4 +1,7 @@
-#include "test.h"
+#include <utils.h>
+#include <DList.h>
+#include <BigInt.h>
+#include <stdio.h>
 
 int main(void)
 {

@@ -1,23 +1,33 @@
 CXX= gcc
 #CCFLAGS= -Wall -Werror -pedantic -ansi
 CCFLAGS= -Wall
-INCLUDEDIR= -I. -I./include -I./src
 
-all: test.out
+INCLUDE= ./include
+SRC= ./src
+INCLUDEDIR= -I. -I$(INCLUDE) -I$(SRC)
 
-test.out: src/utils.o src/DList.o src/BigInt.o test.o
-	$(CXX) $(CCFLAGS) -o $@ $^
+LIB= ./lib
+LIBDIR= -L$(LIB)
 
-utils.o: utils.c
-	$(CXX) $(CCFLAGS) $(INCLUDEDIR) -o $@ -c $<
+TARGET= test.out
 
-DList.o: DList.c
-	$(CXX) $(CCFLAGS) $(INCLUDEDIR) -o $@ -c $<
+SOURCES= $(SRC)/utils test
+OBJECTSFILES= $(SOURCES:=.o)
 
-BigInt.o: BigInt.c
-	$(CXX) $(CCFLAGS) $(INCLUDEDIR) -o $@ -c $<
+all: $(TARGET)
 
-test.o: test.c
+lib: $(LIB)/libDList.so $(LIB)/libBigInt.so
+
+$(TARGET): $(LIB)/libDList.so $(LIB)/libBigInt.so $(OBJECTSFILES)
+	$(CXX) $(CCFLAGS) $(LIBDIR) -o $@ $^ -lSLL
+
+$(LIB)/libDList.so: $(SRC)/DList.c
+	$(CXX) $(CCFLAGS) $(INCLUDEDIR) $< -o $@ -shared -fpic
+
+$(LIB)/libBigInt.so: $(SRC)/BigInt.c
+	$(CXX) $(CCFLAGS) $(INCLUDEDIR) $(LIBDIR) $< -o $@ -shared -fpic -lSLL
+
+%.o: %.c
 	$(CXX) $(CCFLAGS) $(INCLUDEDIR) -o $@ -c $<
 
 clean:
