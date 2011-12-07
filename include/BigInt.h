@@ -28,6 +28,9 @@ typedef Struct_big_integer* BigInteger;
 /* Creator & destructor */
 BigInteger create_big_int(void);
 void delete_big_int(BigInteger b);
+/* Private methods */
+int get_min_loops(BigInteger a, BigInteger b);
+int get_max_loops(BigInteger a, BigInteger b);
 /* Access methods */
 Boolean isNull(BigInteger b);
 int signBigInt(BigInteger b);
@@ -36,6 +39,7 @@ int compareBigInt(BigInteger a, BigInteger b);
 /* Arithmetic methods */
 BigInteger sumBigInt(BigInteger a, BigInteger b);
 BigInteger diffBigInt(BigInteger a, BigInteger b);
+BigInteger mulBigInt(BigInteger a, BigInteger b);
 /* Modifiers */
 BigInteger newBigInteger(char* str);
 /* Debug */

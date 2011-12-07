@@ -38,6 +38,33 @@ void delete_big_int(BigInteger b)
 	b = NULL;
 }
 
+/* Private methods */
+/*  Result: the number of elements of the smallest big-integer
+	Data: two big integers which have to be compare
+	Process: compare a->l->length and b->l->length */
+int get_min_loops(BigInteger a, BigInteger b)
+{
+	int minLoops = 0;
+	if(!isNull(a) && !isNull(b))
+		if(!is_empty(a->l) && !is_empty(b->l))
+			minLoops = (a->l->length < b->l->length) ? a->l->length : b->l->length;
+			
+	return minLoops;
+}
+
+/*  Result: the number of elements of the biggest big-integer
+	Data: two big integers which have to be compare
+	Process: compare a->l->length and b->l->length */
+int get_max_loops(BigInteger a, BigInteger b)
+{
+	int maxLoops = 0;
+	if(!isNull(a) && !isNull(b))
+		if(!is_empty(a->l) && !is_empty(b->l))
+			maxLoops = (a->l->length > b->l->length) ? a->l->length : b->l->length;
+			
+	return maxLoops;
+}
+
 /* Access methods */
 Boolean isNull(BigInteger b)
 {
@@ -160,7 +187,7 @@ int compareBigInt(BigInteger a, BigInteger b)
 	return 0;
 }
 
-/* Arithmetic expression */
+/* Arithmetic methods */
 /*  Return: new big integer which is the sum of a and b
     Data: two big integers to sum
     Process: sum each element from both big integers */
@@ -170,7 +197,7 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
     BigInteger sum = create_big_int();
     Element *currentA = NULL, *currentB = NULL, *rest = NULL;
 
-    if(!is_empty(a) && !is_empty(b))
+    if(!isNull(a) && !isNull(b))
     {
         /* -a + b <=> b - a */
         if(a->sign == -1 && b->sign == 1)
@@ -180,16 +207,9 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
             return diffBigInt(a, b);
 
         /* We compute the minimum number of loop to reach the end of the smallest big integer */
-        if(a->l->length <= b->l->length)
-        {
-            min = a->l->length;
-            max = b->l->length;
-        }
-        else
-        {
-            min = b->l->length;
-            max = a->l->length;
-        }
+		min = get_min_loops(a, b);
+		max = get_min_loops(a, b);
+
         currentA = a->l->tail;
         currentB = b->l->tail;
 
@@ -229,17 +249,23 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
     return sum;
 }
 
+/*  Return: new big integer which is the diff of a and b
+    Data: two big integers to diff
+    Process: diff each element from both big integers */
 BigInteger diffBigInt(BigInteger a, BigInteger b)
 {
     int currentDiff = 0, i = 0, min = 0, max = 0, r = 0, sign = 1;
     BigInteger diff = create_big_int();
     Element *currentA = NULL, *currentB = NULL, *rest = NULL;
 
-    if((!is_empty(a) && !is_empty(b))
+    if((!isNull(a) && !isNull(b))
         && (!is_empty(a->l) && !is_empty(b->l)))
     {
         /* We find the greatest element and the lowest one*/
-        if(a->l->length > b->l->length)
+		min = get_min_loops(a, b);
+		max = get_min_loops(a, b);
+
+        /*if(a->l->length > b->l->length)
         {
             min = b->l->length;
             max = a->l->length;
@@ -250,7 +276,7 @@ BigInteger diffBigInt(BigInteger a, BigInteger b)
             min = a->l->length;
             max = b->l->length;
             diff->sign = -1;
-        }
+        }*/
 
         currentA = a->l->tail;
         currentB = b->l->tail;
@@ -287,6 +313,37 @@ BigInteger diffBigInt(BigInteger a, BigInteger b)
     }
 
     return diff;
+}
+
+/*  Return: new big integer which is the mul of a and b
+    Data: two big integers to mul
+    Process: mul each element from both big integers */
+BigInteger mulBigInteger(BigInteger a, BigInteger b)
+{
+	int currentMul = 0, i = 0, min = 0, max = 0, r = 0;
+	BigInteger mul = create_big_integer();
+	Element *currentA = NULL, *currentB = NULL;
+
+	if(!isNull(a) && !isNull(b))
+	{
+		if(a->sign == 0 || b->sign == 0)
+			return insert_head(mul, (void*)0);
+		else
+		{
+			if(!is_empty(a->l) && !is_empty(b->l))
+			{
+				min = get_min_loops(a, b);
+				max = get_min_loops(a, b);
+				
+				currentA = a->l->tail;
+				currentB = b->l->tail;
+				for(i = 0; i < min; i = i + 1)
+				{
+
+				}
+			}
+		}
+	return mul;
 }
 
 /* Modifiers */
