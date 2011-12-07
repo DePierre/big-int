@@ -320,7 +320,7 @@ BigInteger diffBigInt(BigInteger a, BigInteger b)
     Process: mul each element from both big integers */
 BigInteger mulBigInteger(BigInteger a, BigInteger b)
 {
-	int currentMul = 0, i = 0, min = 0, max = 0, r = 0;
+	int currentMul = 0, i = 0, j = 0, min = 0, max = 0, r = 0;
 	BigInteger mul = create_big_integer();
 	Element *currentA = NULL, *currentB = NULL;
 
@@ -332,14 +332,20 @@ BigInteger mulBigInteger(BigInteger a, BigInteger b)
 		{
 			if(!is_empty(a->l) && !is_empty(b->l))
 			{
-				min = get_min_loops(a, b);
-				max = get_min_loops(a, b);
-				
 				currentA = a->l->tail;
-				currentB = b->l->tail;
-				for(i = 0; i < min; i = i + 1)
+				for(i = 0; i < a->l->length; i = i + 1)
 				{
-
+					currentB = b->l->tail;
+					currentMul = 0;
+					for(j = 0; j < b->l->length; j = j + 1)
+					{
+						currentMul = currentMul + (int)currentA * ((int)currentB + r);
+						currentB = currentB->prev;
+					}
+					r = currentMul / NBDIGITSPOW;
+					currentMul = currentMul % NBDIGITSPOW;
+					diff->l = insert_head(diff->l, (void*)currentDiff);
+					currentA = currentA->prev;
 				}
 			}
 		}
