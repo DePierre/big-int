@@ -48,7 +48,7 @@ int get_min_loops(BigInteger a, BigInteger b)
 	if(!isNull(a) && !isNull(b))
 		if(!is_empty(a->l) && !is_empty(b->l))
 			minLoops = (a->l->length < b->l->length) ? a->l->length : b->l->length;
-			
+
 	return minLoops;
 }
 
@@ -61,7 +61,7 @@ int get_max_loops(BigInteger a, BigInteger b)
 	if(!isNull(a) && !isNull(b))
 		if(!is_empty(a->l) && !is_empty(b->l))
 			maxLoops = (a->l->length > b->l->length) ? a->l->length : b->l->length;
-			
+
 	return maxLoops;
 }
 
@@ -208,7 +208,7 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
 
         /* We compute the minimum number of loop to reach the end of the smallest big integer */
 		min = get_min_loops(a, b);
-		max = get_min_loops(a, b);
+		max = get_max_loops(a, b);
 
         currentA = a->l->tail;
         currentB = b->l->tail;
@@ -254,62 +254,46 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
     Process: diff each element from both big integers */
 BigInteger diffBigInt(BigInteger a, BigInteger b)
 {
-    int currentDiff = 0, i = 0, min = 0, max = 0, r = 0, sign = 1;
+    int currentDiff = 0, i = 0, min = 0, max = 0;
     BigInteger diff = create_big_int();
     Element *currentA = NULL, *currentB = NULL, *rest = NULL;
 
     if((!isNull(a) && !isNull(b))
         && (!is_empty(a->l) && !is_empty(b->l)))
     {
-        /* We find the greatest element and the lowest one*/
-		min = get_min_loops(a, b);
-		max = get_min_loops(a, b);
+        min = get_min_loops(a, b);
+        max = get_max_loops(a, b);
 
-        /*if(a->l->length > b->l->length)
-        {
-            min = b->l->length;
-            max = a->l->length;
-            diff->sign = 1;
-        }
-        else
-        {
-            min = a->l->length;
-            max = b->l->length;
-            diff->sign = -1;
-        }*/
+        diff->sign = compareBigInt(a, b);
 
         currentA = a->l->tail;
         currentB = b->l->tail;
-        /* There are at least min loops to diff each elements */
         for(i = 0; i < min; i = i + 1)
         {
-            sign = (a->l->length >= b->l->length) ? 1 : -1;
-            printf("r = %d\n", r);
-            currentDiff = (sign)*(int)currentA->d - ((int)currentB->d + r);
-            if(currentDiff < 0)
+            if((int)currentA >= (int)currentB)
             {
-                currentDiff = NBDIGITSPOW + currentDiff;
-                r = 1;
+                currentDiff = (int)currentA->d -(int)currentB->d;
+                printf("%d - %d = (%d)\n", (int)currentA->d, (int)currentB->d, currentDiff);
             }
             else
-                r = 0;
-            printf("Cas 1 : %d = %d - %d\n", currentDiff, currentA->d, ((int)currentB->d + r));
+            {
+                currentDiff = (int)currentB->d - (int)currentA->d;
+                printf("%d - %d = (%d)\n", (int)currentB->d, (int)currentA->d, currentDiff);
+            }
+            diff->l = insert_head(diff->l, (void*)currentDiff);
+
             currentA = currentA->prev;
             currentB = currentB->prev;
-
-            diff->l = insert_head(diff->l, (void*)currentDiff);
         }
-        /* There are (max - min) loops to do to diff the rest
-        of the lowest big-int */
+        /* We save the position in the greatest big integer */
         rest = (i == a->l->length) ? currentB : currentA;
         for(i = min; i < max; i = i + 1)
         {
-            currentDiff = (int)rest->d - r;
+            currentDiff = (int)rest->d;
             rest = rest->prev;
-            r = 0;
             diff->l = insert_head(diff->l, (void*)currentDiff);
         }
-        printf("DEBUG\n");
+
     }
 
     return diff;
@@ -318,37 +302,59 @@ BigInteger diffBigInt(BigInteger a, BigInteger b)
 /*  Return: new big integer which is the mul of a and b
     Data: two big integers to mul
     Process: mul each element from both big integers */
-BigInteger mulBigInteger(BigInteger a, BigInteger b)
+BigInteger mulBigInt(BigInteger a, BigInteger b)
 {
-	int currentMul = 0, i = 0, j = 0, min = 0, max = 0, r = 0;
-	BigInteger mul = create_big_integer();
-	Element *currentA = NULL, *currentB = NULL;
+	int currentMul = 0, i = 0, j = 0, carry = 0, sign = 0;
+	BigInteger mul = create_big_int();
+	Element *currentGreatest = NULL, *currentLowest = NULL;
+    BigInteger greatest = NULL, lowest = NULL;
 
 	if(!isNull(a) && !isNull(b))
 	{
 		if(a->sign == 0 || b->sign == 0)
-			return insert_head(mul, (void*)0);
+        {
+			mul->l = insert_head(mul->l, (void*)0);
+            return mul;
+        }
 		else
 		{
 			if(!is_empty(a->l) && !is_empty(b->l))
 			{
-				currentA = a->l->tail;
-				for(i = 0; i < a->l->length; i = i + 1)
+                sign = compareBigInt(a, b);
+                if(sign == 1)
+                {
+                    greatest = a;
+                    lowest = b;
+                }
+                else if(sign == -1)
+                {
+                    greatest = b;
+                    lowest = a;
+                }
+				currentGreatest = greatest->l->tail;
+				for(i = 0; i < greatest->l->length; i = i + 1)
 				{
-					currentB = b->l->tail;
+					currentLowest = lowest->l->tail;
 					currentMul = 0;
-					for(j = 0; j < b->l->length; j = j + 1)
+					for(j = 0; j < lowest->l->length; j = j + 1)
 					{
-						currentMul = currentMul + (int)currentA * ((int)currentB + r);
-						currentB = currentB->prev;
+						currentMul = currentMul + (int)currentGreatest->d * ((int)currentLowest->d + carry);
+                        /* DEBUG */
+                        printf("%d * %d = (%d + %d)\n", (int)currentGreatest->d, (int)currentLowest->d, currentMul, carry);
+						currentLowest = currentLowest->prev;
 					}
-					r = currentMul / NBDIGITSPOW;
+					carry = currentMul / NBDIGITSPOW;
 					currentMul = currentMul % NBDIGITSPOW;
-					diff->l = insert_head(diff->l, (void*)currentDiff);
-					currentA = currentA->prev;
+					mul->l = insert_head(mul->l, (void*)currentMul);
+
+					currentGreatest = currentGreatest->prev;
 				}
+                if(carry != 0)
+                    mul->l = insert_head(mul->l, (void*)carry);
 			}
 		}
+    }
+
 	return mul;
 }
 
