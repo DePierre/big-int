@@ -311,6 +311,7 @@ BigInteger mulBigInt(BigInteger a, BigInteger b)
 
 	if(!isNull(a) && !isNull(b))
 	{
+		/* Special case : a = 0 or b = 0 */
 		if(a->sign == 0 || b->sign == 0)
         {
 			mul->l = insert_head(mul->l, (void*)0);
@@ -331,6 +332,10 @@ BigInteger mulBigInt(BigInteger a, BigInteger b)
                     greatest = b;
                     lowest = a;
                 }
+				/* Special case : if b = 1, a * b = a */
+				if(lowest->l->length == 1 && (int)lowest->l->head->d == 1)
+					return greatest;
+					
 				currentGreatest = greatest->l->tail;
 				for(i = 0; i < greatest->l->length; i = i + 1)
 				{
@@ -360,17 +365,32 @@ BigInteger mulBigInt(BigInteger a, BigInteger b)
 
 BigInteger divBigInteger(BigInteger a, BigInteger b)
 {
-	int i = 0, j = 0;
+	int i = 0, j = 0, compare;
 	BigInteger div = create_big_integer();
 	Element *currentA = NULL, *currentB = NULL;
 	
 	if(!isNull(a) && !isNull(b))
 	{
-		if(a->l->length < b->l->length)
+		/* Special cases */
+		compare = compareBigInt(a, b);
+		/* a < b, a / b = 0 */
+		if(compare == -1)
 		{
 			div->l = insert_head(div->l, (void*)0);
             return div;
         }
+		/* a = b, a / b = 1 */
+		else if(compare == 0)
+		{
+			div->l = insert_head(div->l, (void*)1);
+            return div;
+		}
+		/* b = 1, a / b = a */
+		if(b->l->length == 1 && (int)b->l->head->d == 1)
+		{
+			return a;
+		}
+		
 		currentA = a->l->tail;
 		currentB = b->l->tail;
 		for(i = 0; i < a->l->length; i = i + 1)
