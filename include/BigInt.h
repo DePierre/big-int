@@ -40,6 +40,7 @@ int compareBigInt(BigInteger a, BigInteger b);
 BigInteger sumBigInt(BigInteger a, BigInteger b);
 BigInteger diffBigInt(BigInteger a, BigInteger b);
 BigInteger mulBigInt(BigInteger a, BigInteger b);
+BigInteger divBigInteger(BigInteger a, BigInteger b);
 /* Modifiers */
 BigInteger newBigInteger(char* str);
 /* Debug */

@@ -358,6 +358,30 @@ BigInteger mulBigInt(BigInteger a, BigInteger b)
 	return mul;
 }
 
+BigInteger divBigInteger(BigInteger a, BigInteger b)
+{
+	int i = 0, j = 0;
+	BigInteger div = create_big_integer();
+	Element *currentA = NULL, *currentB = NULL;
+	
+	if(!isNull(a) && !isNull(b))
+	{
+		if(a->l->length < b->l->length)
+		{
+			div->l = insert_head(div->l, (void*)0);
+            return div;
+        }
+		currentA = a->l->tail;
+		currentB = b->l->tail;
+		for(i = 0; i < a->l->length; i = i + 1)
+		{
+			/* TODO */
+		}
+	}
+	
+	return div;
+}
+
 /* Modifiers */
 /*  Result: new big integer
 	Data: number as a string
