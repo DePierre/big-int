@@ -5,6 +5,7 @@
 */
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <utils.h>
 #include <DList.h>
 #include <BigInt.h>
@@ -203,7 +204,7 @@ BigInteger sumBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
         if(firstBigInt->sign == -1 && secondBigInt->sign == 1)
             return diffBigInt(secondBigInt, firstBigInt);
         /* a + (-b) <=> a - b */
-        else if(firstBigInt->sign == 1 && secondBigInt-:>sign == -1)
+        else if(firstBigInt->sign == 1 && secondBigInt->sign == -1)
             return diffBigInt(firstBigInt, secondBigInt);
 
         /* We compute the minimum number of loop to reach the end of the smallest big integer */
@@ -365,7 +366,7 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 
 BigInteger divBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
-	int i = 0, j = 0, compare = 0, currentDiv = 0, carry = 0;
+	int i = 0, compare = 0, currentDiv = 0, carry = 0;
 	BigInteger div = create_big_int();
 	Element *currentFirst = NULL, *currentSecond = NULL;
 

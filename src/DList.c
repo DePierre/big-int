@@ -58,7 +58,7 @@ void delete_list(DList input)
 		  index of the element that we are looking for
 	Process: if n is lower or equal than length/2, we start from the
 	begin of the list. Otherwise, we start from the end. */
-void* value_of(DList input, unsigned int n)
+int value_of(DList input, unsigned int n)
 {
 	unsigned int i = 1, k = 0;
 	Element* current = NULL;
@@ -96,13 +96,13 @@ void* value_of(DList input, unsigned int n)
         else
             return tail_value(input);
 	}
-	return NULL;
+	return 0;
 }
 
 /*  Result: data of the first element of the list
 	Data: list to analyse
 	Process: We go back to the first element and return the data */
-void* head_value(DList input)
+int head_value(DList input)
 {
 	Element* current = NULL;
 
@@ -111,13 +111,13 @@ void* head_value(DList input)
 		current = input->head;
 		return current->key;
 	}
-	return NULL;
+	return 0;
 }
 
 /*  Result: data of the last element of the list
 	Data: list to analyse
 	Process: We go to the last element and return the data */
-void* tail_value(DList input)
+int tail_value(DList input)
 {
 	Element* current = NULL;
 
@@ -127,7 +127,7 @@ void* tail_value(DList input)
 		return current->key;
 	}
 
-	return NULL;
+	return 0;
 }
 
 /*  Result: length of the list
@@ -156,7 +156,7 @@ DList insert_of(DList input, int value, unsigned int n)
 	if(!is_empty(newElem))
 	{
 		newElem->next = NULL;
-		newElem>prev = NULL;
+		newElem->prev = NULL;
 		newElem->key = value;
 	}
 

@@ -5,6 +5,7 @@
 
 int main(void)
 {
+    int test = 0;
     BigInteger bigInt1 = newBigInteger("999900009876");
     BigInteger bigInt2 = newBigInteger("999999999999");
     BigInteger bigInt3 = newBigInteger("9999");
@@ -12,7 +13,6 @@ int main(void)
     BigInteger bigInt5 = newBigInteger("999922221234");
     BigInteger bigInt6 = newBigInteger("111111111111");
     BigInteger sum = NULL, diff = NULL, mul = NULL, div = NULL;;
-    int test = 0;
 
     printf("Hello world!\n");
     printBigInteger(bigInt1);

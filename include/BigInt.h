@@ -14,7 +14,7 @@
 
 #define NBDIGITS 4 /* Number of digits by each element */
 /* Each number can't be greater than 10,00 */
-#define NBDIGITSPOW (int)pow(10, NBDIGITS)
+#define NBDIGITSPOW (int)power(10, NBDIGITS)
 
 /* Record of a big integer */
 typedef struct

@@ -1,6 +1,5 @@
 CXX= gcc
-#CCFLAGS= -Wall -Werror -pedantic -ansi
-CCFLAGS= -Wall
+CCFLAGS= -Wall -Werror -pedantic -ansi
 
 INCLUDE= ./include
 SRC= ./src
