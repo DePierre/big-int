@@ -13,7 +13,7 @@
 /* Record of one element */
 typedef struct element
 {
-	void* d; /* Data of the element */
+	int key; /* Data of the element */
 	struct element* next; /* Pointer to the next element */
 	struct element* prev; /* Pointer to the previous element */
 } Element;
@@ -30,21 +30,21 @@ typedef Struct_dlist* DList;
 
 /* Creator & destructor */
 DList create_list(void);
-void delete_list(DList l);
+void delete_list(DList);
 /* Access methods */
-void* value_of(DList l, unsigned int n);
-void* head_value(DList l);
-void* tail_value(DList l);
-unsigned int length_list(DList l);
+int value_of(DList, unsigned int);
+int head_value(DList);
+int tail_value(DList);
+unsigned int length_list(DList);
 /* Modifiers */
-DList insert_of(DList l, void* data, unsigned int n);
-DList insert_head(DList l, void* data);
-DList insert_tail(DList l, void* data);
-DList remove_of(DList l, unsigned int n);
-DList remove_head(DList l);
-DList remove_tail(DList l);
+DList insert_of(DList, int, unsigned int);
+DList insert_head(DList, int);
+DList insert_tail(DList, int);
+DList remove_of(DList, unsigned int);
+DList remove_head(DList);
+DList remove_tail(DList);
 /* Debug */
-void print_list(DList l);
+void print_list(DList);
 
 #endif
 

@@ -20,31 +20,31 @@
 typedef struct
 {
 	int sign; /* Sign of the big int */
-	DList l; /* Pointer to the list */
+	DList list; /* Pointer to the list */
 } Struct_big_integer;
 
 typedef Struct_big_integer* BigInteger;
 
 /* Creator & destructor */
 BigInteger create_big_int(void);
-void delete_big_int(BigInteger b);
+void delete_big_int(BigInteger);
 /* Private methods */
-int get_min_loops(BigInteger a, BigInteger b);
-int get_max_loops(BigInteger a, BigInteger b);
+int get_min_loops(BigInteger, BigInteger);
+int get_max_loops(BigInteger, BigInteger);
 /* Access methods */
-Boolean isNull(BigInteger b);
-int signBigInt(BigInteger b);
-Boolean equalsBigInt(BigInteger a, BigInteger b);
-int compareBigInt(BigInteger a, BigInteger b);
+Boolean isNull(BigInteger);
+int signBigInt(BigInteger);
+Boolean equalsBigInt(BigInteger, BigInteger);
+int compareBigInt(BigInteger, BigInteger);
 /* Arithmetic methods */
-BigInteger sumBigInt(BigInteger a, BigInteger b);
-BigInteger diffBigInt(BigInteger a, BigInteger b);
-BigInteger mulBigInt(BigInteger a, BigInteger b);
-BigInteger divBigInteger(BigInteger a, BigInteger b);
+BigInteger sumBigInt(BigInteger, BigInteger);
+BigInteger diffBigInt(BigInteger, BigInteger);
+BigInteger mulBigInt(BigInteger, BigInteger);
+BigInteger divBigInt(BigInteger, BigInteger);
 /* Modifiers */
 BigInteger newBigInteger(char* str);
 /* Debug */
-void printBigInteger(BigInteger b);
+void printBigInteger(BigInteger);
 
-#endif
+#endif /* DEF_BIGINT */
 

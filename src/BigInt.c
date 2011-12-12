@@ -16,14 +16,14 @@
 	Process: Allocate a new BigInteger element and initialize it */
 BigInteger create_big_int(void)
 {
-	BigInteger b = NULL;
-	b = (BigInteger) calloc(1, sizeof(Struct_big_integer));
+	BigInteger bigInt = NULL;
+	bigInt = (BigInteger) calloc(1, sizeof(Struct_big_integer));
 
-	if(!is_empty(b))
+	if(!is_empty(bigInt))
 	{
-		b->sign = 0;
-		b->l = create_list();
-		return b;
+		bigInt->sign = 0;
+		bigInt->list = create_list();
+		return bigInt;
 	}
 	return NULL;
 }
@@ -31,49 +31,49 @@ BigInteger create_big_int(void)
 /*  Result: nothing
 	Data: big integer to delete
 	Process: use list datatype's destructor  and free the big integer */
-void delete_big_int(BigInteger b)
+void delete_big_int(BigInteger input)
 {
-	delete_list(b->l);
-    free(b);
-	b = NULL;
+	delete_list(input->list);
+    free(input);
+	input = NULL;
 }
 
 /* Private methods */
 /*  Result: the number of elements of the smallest big-integer
 	Data: two big integers which have to be compare
-	Process: compare a->l->length and b->l->length */
-int get_min_loops(BigInteger a, BigInteger b)
+	Process: compare firstBigInt->list->length and secondBigInt->list->length */
+int get_min_loops(BigInteger firstBigInt, BigInteger secondBigInt)
 {
 	int minLoops = 0;
-	if(!isNull(a) && !isNull(b))
-		if(!is_empty(a->l) && !is_empty(b->l))
-			minLoops = (a->l->length < b->l->length) ? a->l->length : b->l->length;
+	if(!isNull(firstBigInt) && !isNull(secondBigInt))
+		if(!is_empty(firstBigInt->list) && !is_empty(secondBigInt->list))
+			minLoops = (firstBigInt->list->length < secondBigInt->list->length) ? firstBigInt->list->length : secondBigInt->list->length;
 
 	return minLoops;
 }
 
 /*  Result: the number of elements of the biggest big-integer
 	Data: two big integers which have to be compare
-	Process: compare a->l->length and b->l->length */
-int get_max_loops(BigInteger a, BigInteger b)
+	Process: compare firstBigInt->list->length and secondBigInt->list->length */
+int get_max_loops(BigInteger firstBigInt, BigInteger secondBigInt)
 {
 	int maxLoops = 0;
-	if(!isNull(a) && !isNull(b))
-		if(!is_empty(a->l) && !is_empty(b->l))
-			maxLoops = (a->l->length > b->l->length) ? a->l->length : b->l->length;
+	if(!isNull(firstBigInt) && !isNull(secondBigInt))
+		if(!is_empty(firstBigInt->list) && !is_empty(secondBigInt->list))
+			maxLoops = (firstBigInt->list->length > secondBigInt->list->length) ? firstBigInt->list->length : secondBigInt->list->length;
 
 	return maxLoops;
 }
 
 /* Access methods */
-Boolean isNull(BigInteger b)
+Boolean isNull(BigInteger input)
 {
-	return is_empty(b);
+	return is_empty(input);
 }
 
-int signBigInt(BigInteger b)
+int signBigInt(BigInteger input)
 {
-	return (is_empty(b->l)) ? 0 : (b->sign == 1) ? 1 : (b->sign == 0) ? 0 : -1;
+	return (is_empty(input->list)) ? 0 : (input->sign == 1) ? 1 : (input->sign == 0) ? 0 : -1;
 }
 
 /*  Result: true if a == b, false otherwise
@@ -82,38 +82,38 @@ int signBigInt(BigInteger b)
 	compare if there is the same number of elements into the 2 lists of
 	numbers and then, we travers the 2 list to compare each value of
 	each list, otherwise, the 2 BigInt aren't equals */
-Boolean equalsBigInt(BigInteger a, BigInteger b)
+Boolean equalsBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
-	Element *pa = NULL, *pb = NULL;
+	Element *currentFirst = NULL, *currentSecond = NULL;
 
 	/* If the 2 BigInt aren't empty */
-	if(!isNull(a) && !isNull(b))
+	if(!isNull(firstBigInt) && !isNull(secondBigInt))
 	{
 		/* If they have the same sign but not zero */
-		if((a->sign == b->sign) && a->sign != 0)
+		if((firstBigInt->sign == secondBigInt->sign) && firstBigInt->sign != 0)
 		{
 			/* If the 2 list of both aren't empty too */
-			if(!is_empty(a->l) && !is_empty(b->l))
+			if(!is_empty(firstBigInt->list) && !is_empty(secondBigInt->list))
 			{
 				/* If there is the same number of element into both list */
-				if(a->l->length == b->l->length)
+				if(firstBigInt->list->length == secondBigInt->list->length)
 				{
-					pa = a->l->tail;
-					pb = b->l->tail;
-					while(!is_empty(pa->prev) && !is_empty(pa->prev) && (pa->d == pb->d))
+					currentFirst = firstBigInt->list->tail;
+					currentSecond = secondBigInt->list->tail;
+					while(!is_empty(currentFirst->prev) && !is_empty(currentFirst->prev) && (currentFirst->key == currentSecond->key))
 					{
-						pa = pa->prev;
-						pb = pb->prev;
+						currentFirst = currentFirst->prev;
+						currentSecond = currentSecond->prev;
 					}
 					/* We check if we stop because of there is no more element, or because
 					there is no more equality */
-					if(pa->d == pb->d)
+					if(currentFirst->key == currentSecond->key)
 						return TRUE; /* Then they are equals */
 				}
 			}
 		}
 		/* If both sign are equals to 0, a == b == 0 */
-		else if(a->sign == 0 && b->sign == 0)
+		else if(firstBigInt->sign == 0 && secondBigInt->sign == 0)
 			return TRUE;
 	}
 
@@ -127,45 +127,45 @@ Boolean equalsBigInt(BigInteger a, BigInteger b)
 	Process: check each property of both BigInt, if they
 	are equals, we use equalsBigInt, otherwise, we return
 	the rigth value */
-int compareBigInt(BigInteger a, BigInteger b)
+int compareBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
-	Element *pa = NULL, *pb = NULL;
-	if(!isNull(a) && !isNull(b))
+	Element *currentFirst = NULL, *currentSecond = NULL;
+	if(!isNull(firstBigInt) && !isNull(secondBigInt))
 	{
-		if(!is_empty(a->l) && !is_empty(b->l))
+		if(!is_empty(firstBigInt->list) && !is_empty(secondBigInt->list))
 		{
-			if(equalsBigInt(a, b))
+			if(equalsBigInt(firstBigInt, secondBigInt))
 				return 0;
 			else
 			{
-				/* a > 0 and b < 0 => a > b */
-				if(a->sign > b->sign)
+				/* a > 0 and b < 0 => firstBigInt > b */
+				if(firstBigInt->sign > secondBigInt->sign)
 					return 1;
 				/* a < 0 and b > 0 => a < b */
-				else if(a->sign < b->sign)
+				else if(firstBigInt->sign < secondBigInt->sign)
 					return -1;
 				/* if a > 0 and b > 0 OR a < 0 and b < 0 */
 				else
 				{
 					/* if a has more element than b => a > b */
-					if(a->l->length > b->l->length)
+					if(firstBigInt->list->length > secondBigInt->list->length)
 						return 1;
 					/* else if a has less element than b => a < b */
-					else if(a->l->length < b->l->length)
+					else if(firstBigInt->list->length < secondBigInt->list->length)
 						return -1;
 					/* else we have to reach the first element which is different
 					between a and b */
 					else
 					{
-						pa = a->l->tail;
-						pb = b->l->tail;
-						while(!is_empty(pa->prev) && !is_empty(pb->prev) && (pa->d == pb->d))
+						currentFirst = firstBigInt->list->tail;
+						currentSecond = secondBigInt->list->tail;
+						while(!is_empty(currentFirst->prev) && !is_empty(currentSecond->prev) && (currentFirst->key == currentSecond->key))
 						{
-							pa = pa->prev;
-							pb = pb->prev;
+							currentFirst = currentFirst->prev;
+							currentSecond = currentSecond->prev;
 						}
 						/* a > b */
-						if(pa->d > pb->d)
+						if(currentFirst->key > currentSecond->key)
 							return 1;
 						/* a < b */
 						else /* We don't check if they are equals because we already did it */
@@ -174,14 +174,14 @@ int compareBigInt(BigInteger a, BigInteger b)
 				}
 			}
 		}
-		else if(!is_empty(a->l) && is_empty(b->l))
+		else if(!is_empty(firstBigInt->list) && is_empty(secondBigInt->list))
 			return 1;
-		else if(is_empty(a->l) && !is_empty(b->l))
+		else if(is_empty(firstBigInt->list) && !is_empty(secondBigInt->list))
 			return -1;
 	}
-	else if(!isNull(a) && isNull(b))
+	else if(!isNull(firstBigInt) && isNull(secondBigInt))
 		return 1;
-	else if(isNull(a) && !isNull(b))
+	else if(isNull(firstBigInt) && !isNull(secondBigInt))
 		return -1;
 
 	return 0;
@@ -191,58 +191,58 @@ int compareBigInt(BigInteger a, BigInteger b)
 /*  Return: new big integer which is the sum of a and b
     Data: two big integers to sum
     Process: sum each element from both big integers */
-BigInteger sumBigInt(BigInteger a, BigInteger b)
+BigInteger sumBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
     int currentSum = 0, i = 0, min = 0, max = 0, r = 0;
     BigInteger sum = create_big_int();
-    Element *currentA = NULL, *currentB = NULL, *rest = NULL;
+    Element *currentFirst = NULL, *currentSecond = NULL, *rest = NULL;
 
-    if(!isNull(a) && !isNull(b))
+    if(!isNull(firstBigInt) && !isNull(secondBigInt))
     {
         /* -a + b <=> b - a */
-        if(a->sign == -1 && b->sign == 1)
-            return diffBigInt(b, a);
+        if(firstBigInt->sign == -1 && secondBigInt->sign == 1)
+            return diffBigInt(secondBigInt, firstBigInt);
         /* a + (-b) <=> a - b */
-        else if(a->sign == 1 && b->sign == -1)
-            return diffBigInt(a, b);
+        else if(firstBigInt->sign == 1 && secondBigInt-:>sign == -1)
+            return diffBigInt(firstBigInt, secondBigInt);
 
         /* We compute the minimum number of loop to reach the end of the smallest big integer */
-		min = get_min_loops(a, b);
-		max = get_max_loops(a, b);
+		min = get_min_loops(firstBigInt, secondBigInt);
+		max = get_max_loops(firstBigInt, secondBigInt);
 
-        currentA = a->l->tail;
-        currentB = b->l->tail;
+        currentFirst = firstBigInt->list->tail;
+        currentSecond = secondBigInt->list->tail;
 
         for(i = 0; i < min; i = i + 1)
         {
             /* We sum both numbers */
-            currentSum = (int)currentA->d + (int)currentB->d + r;
+            currentSum = currentFirst->key + currentSecond->key + r;
             /* We switch to the next elements */
-            currentA = currentA->prev;
-            currentB = currentB->prev;
+            currentFirst = currentFirst->prev;
+            currentSecond = currentSecond->prev;
 
             /* We save the deduction */
             r = currentSum / NBDIGITSPOW;
             /* We cast currentSum to a number with maximum 4 digits */
             currentSum = currentSum % NBDIGITSPOW;
             /* We insert the result into the new big int */
-            sum->l = insert_head(sum->l, (void*)currentSum);
+            sum->list = insert_head(sum->list, currentSum);
         }
         /* We save the position in the greatest big integer */
-        rest = (i == a->l->length) ? currentB : currentA;
+        rest = (i == firstBigInt->list->length) ? currentSecond : currentFirst;
         /* And we summ the rest of it */
         for(i = min; i < max; i = i + 1)
         {
-            currentSum = (int)rest->d + r;
+            currentSum = rest->key + r;
             rest = rest->prev;
 
             r = currentSum / NBDIGITSPOW;
             currentSum = currentSum % NBDIGITSPOW;
-            sum->l = insert_head(sum->l, (void*)currentSum);
+            sum->list = insert_head(sum->list, currentSum);
         }
         /* If the deduction is not equal to zero we add it */
         if(r != 0)
-            sum->l = insert_head(sum->l, (void*)r);
+            sum->list = insert_head(sum->list, r);
     }
 
 
@@ -252,46 +252,46 @@ BigInteger sumBigInt(BigInteger a, BigInteger b)
 /*  Return: new big integer which is the diff of a and b
     Data: two big integers to diff
     Process: diff each element from both big integers */
-BigInteger diffBigInt(BigInteger a, BigInteger b)
+BigInteger diffBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
     int currentDiff = 0, i = 0, min = 0, max = 0;
     BigInteger diff = create_big_int();
-    Element *currentA = NULL, *currentB = NULL, *rest = NULL;
+    Element *currentFirst = NULL, *currentSecond = NULL, *rest = NULL;
 
-    if((!isNull(a) && !isNull(b))
-        && (!is_empty(a->l) && !is_empty(b->l)))
+    if((!isNull(firstBigInt) && !isNull(secondBigInt))
+        && (!is_empty(firstBigInt->list) && !is_empty(secondBigInt->list)))
     {
-        min = get_min_loops(a, b);
-        max = get_max_loops(a, b);
+        min = get_min_loops(firstBigInt, secondBigInt);
+        max = get_max_loops(firstBigInt, secondBigInt);
 
-        diff->sign = compareBigInt(a, b);
+        diff->sign = compareBigInt(firstBigInt, secondBigInt);
 
-        currentA = a->l->tail;
-        currentB = b->l->tail;
+        currentFirst = firstBigInt->list->tail;
+        currentSecond = secondBigInt->list->tail;
         for(i = 0; i < min; i = i + 1)
         {
-            if((int)currentA >= (int)currentB)
+            if(currentFirst >= currentSecond)
             {
-                currentDiff = (int)currentA->d -(int)currentB->d;
-                printf("%d - %d = (%d)\n", (int)currentA->d, (int)currentB->d, currentDiff);
+                currentDiff = currentFirst->key - currentSecond->key;
+                printf("%d - %d = (%d)\n", currentFirst->key, currentSecond->key, currentDiff);
             }
             else
             {
-                currentDiff = (int)currentB->d - (int)currentA->d;
-                printf("%d - %d = (%d)\n", (int)currentB->d, (int)currentA->d, currentDiff);
+                currentDiff = currentSecond->key - currentFirst->key;
+                printf("%d - %d = (%d)\n", currentSecond->key, currentFirst->key, currentDiff);
             }
-            diff->l = insert_head(diff->l, (void*)currentDiff);
+            diff->list = insert_head(diff->list, currentDiff);
 
-            currentA = currentA->prev;
-            currentB = currentB->prev;
+            currentFirst = currentFirst->prev;
+            currentSecond = currentSecond->prev;
         }
         /* We save the position in the greatest big integer */
-        rest = (i == a->l->length) ? currentB : currentA;
+        rest = (i == firstBigInt->list->length) ? currentSecond : currentFirst;
         for(i = min; i < max; i = i + 1)
         {
-            currentDiff = (int)rest->d;
+            currentDiff = rest->key;
             rest = rest->prev;
-            diff->l = insert_head(diff->l, (void*)currentDiff);
+            diff->list = insert_head(diff->list, currentDiff);
         }
 
     }
@@ -302,60 +302,60 @@ BigInteger diffBigInt(BigInteger a, BigInteger b)
 /*  Return: new big integer which is the mul of a and b
     Data: two big integers to mul
     Process: mul each element from both big integers */
-BigInteger mulBigInt(BigInteger a, BigInteger b)
+BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
 	int currentMul = 0, i = 0, j = 0, carry = 0, sign = 0;
 	BigInteger mul = create_big_int();
 	Element *currentGreatest = NULL, *currentLowest = NULL;
     BigInteger greatest = NULL, lowest = NULL;
 
-	if(!isNull(a) && !isNull(b))
+	if(!isNull(firstBigInt) && !isNull(secondBigInt))
 	{
 		/* Special case : a = 0 or b = 0 */
-		if(a->sign == 0 || b->sign == 0)
+		if(firstBigInt->sign == 0 || secondBigInt->sign == 0)
         {
-			mul->l = insert_head(mul->l, (void*)0);
+			mul->list = insert_head(mul->list, 0);
             return mul;
         }
 		else
 		{
-			if(!is_empty(a->l) && !is_empty(b->l))
+			if(!is_empty(firstBigInt->list) && !is_empty(secondBigInt->list))
 			{
-                sign = compareBigInt(a, b);
+                sign = compareBigInt(firstBigInt, secondBigInt);
                 if(sign == 1)
                 {
-                    greatest = a;
-                    lowest = b;
+                    greatest = firstBigInt;
+                    lowest = secondBigInt;
                 }
                 else if(sign == -1)
                 {
-                    greatest = b;
-                    lowest = a;
+                    greatest = secondBigInt;
+                    lowest = firstBigInt;
                 }
 				/* Special case : if b = 1, a * b = a */
-				if(lowest->l->length == 1 && (int)lowest->l->head->d == 1)
+				if(lowest->list->length == 1 && lowest->list->head->key == 1)
 					return greatest;
-					
-				currentGreatest = greatest->l->tail;
-				for(i = 0; i < greatest->l->length; i = i + 1)
+
+				currentGreatest = greatest->list->tail;
+				for(i = 0; i < greatest->list->length; i = i + 1)
 				{
-					currentLowest = lowest->l->tail;
+					currentLowest = lowest->list->tail;
 					currentMul = 0;
-					for(j = 0; j < lowest->l->length; j = j + 1)
+					for(j = 0; j < lowest->list->length; j = j + 1)
 					{
-						currentMul = currentMul + (int)currentGreatest->d * ((int)currentLowest->d + carry);
+						currentMul = currentMul + currentGreatest->key * (currentLowest->key + carry);
                         /* DEBUG */
-                        printf("%d * %d = (%d + %d)\n", (int)currentGreatest->d, (int)currentLowest->d, currentMul, carry);
+                        printf("%d * %d = (%d + %d)\n", currentGreatest->key, currentLowest->key, currentMul, carry);
 						currentLowest = currentLowest->prev;
 					}
 					carry = currentMul / NBDIGITSPOW;
 					currentMul = currentMul % NBDIGITSPOW;
-					mul->l = insert_head(mul->l, (void*)currentMul);
+					mul->list = insert_head(mul->list, currentMul);
 
 					currentGreatest = currentGreatest->prev;
 				}
                 if(carry != 0)
-                    mul->l = insert_head(mul->l, (void*)carry);
+                    mul->list = insert_head(mul->list, carry);
 			}
 		}
     }
@@ -363,42 +363,63 @@ BigInteger mulBigInt(BigInteger a, BigInteger b)
 	return mul;
 }
 
-BigInteger divBigInteger(BigInteger a, BigInteger b)
+BigInteger divBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
-	int i = 0, j = 0, compare;
-	BigInteger div = create_big_integer();
-	Element *currentA = NULL, *currentB = NULL;
-	
-	if(!isNull(a) && !isNull(b))
+	int i = 0, j = 0, compare = 0, currentDiv = 0, carry = 0;
+	BigInteger div = create_big_int();
+	Element *currentFirst = NULL, *currentSecond = NULL;
+
+	if(!isNull(firstBigInt) && !isNull(secondBigInt))
 	{
 		/* Special cases */
-		compare = compareBigInt(a, b);
+		compare = compareBigInt(firstBigInt, secondBigInt);
+        printf("DEBUG\n");
 		/* a < b, a / b = 0 */
 		if(compare == -1)
 		{
-			div->l = insert_head(div->l, (void*)0);
+			div->list = insert_head(div->list, 0);
             return div;
         }
 		/* a = b, a / b = 1 */
 		else if(compare == 0)
 		{
-			div->l = insert_head(div->l, (void*)1);
+			div->list = insert_head(div->list, 1);
             return div;
 		}
 		/* b = 1, a / b = a */
-		if(b->l->length == 1 && (int)b->l->head->d == 1)
+		if(secondBigInt->list->length == 1 && secondBigInt->list->head->key == 1)
+			return firstBigInt;
+
+        printf("DEBUG\n");
+
+		currentFirst = firstBigInt->list->tail;
+		currentSecond = secondBigInt->list->tail;
+		for(i = 0; i < firstBigInt->list->length; i = i + 1)
 		{
-			return a;
-		}
-		
-		currentA = a->l->tail;
-		currentB = b->l->tail;
-		for(i = 0; i < a->l->length; i = i + 1)
-		{
+            /* Works if length(a) = length(b) */
 			/* TODO */
+            currentDiv = (currentFirst->key / currentSecond->key);
+            carry = currentDiv / NBDIGITSPOW;
+
+            printf("%d / %d =>\t", currentFirst->key, currentSecond->key);
+            printf("currentDiv = %d\n", currentDiv);
+            printf("carry = %d\n", carry);
+
+            if(carry)
+            {
+                currentDiv = currentDiv % NBDIGITSPOW;
+                div->list = insert_head(div->list, currentDiv);
+                currentDiv = carry;
+                carry = 0;
+                printf("DEBUG\n");
+            }
+
+            currentFirst = currentFirst->prev;
+            currentSecond = currentSecond->prev;
 		}
+        div->list = insert_head(div->list, currentDiv);
 	}
-	
+
 	return div;
 }
 
@@ -410,22 +431,22 @@ BigInteger newBigInteger(char* str)
 {
 	char tmp[NBDIGITS + 1];
 	int length = 0, l = 0, r = 0, c = 0, i = 0;
-	BigInteger b = NULL;
-	b = create_big_int();
+	BigInteger bigInt = NULL;
+	bigInt = create_big_int();
 
-	if(!is_empty(b))
+	if(!is_empty(bigInt))
 	{
 		/* Take into account the sign of the big integer */
 		if(!isdigit(str[0]))
 		{
 			if(str[0] == '-')
-				b->sign = -1;
+				bigInt->sign = -1;
 			else if(str[0] == '+')
-				b->sign = 1;
+				bigInt->sign = 1;
 			str = &str[1]; /* Gap of the sign */
 		}
 		else
-			b->sign = 1;
+			bigInt->sign = 1;
 
 		length = strlen(str);
 		r = length % NBDIGITS; /* Rest of the length */
@@ -438,7 +459,7 @@ BigInteger newBigInteger(char* str)
 			tmp[NBDIGITS] = '\0';
 			c = atoi(tmp);
 			/* Create new element which contains the group of NBDIGITS digits */
-			b->l = insert_head(b->l, (void*)c);
+			bigInt->list = insert_head(bigInt->list, c);
 		}
 		/* If the length of the list was not already a multiple of NBDIGITS */
 		if( r != 0)
@@ -447,29 +468,29 @@ BigInteger newBigInteger(char* str)
 			memcpy(tmp, str, r);
 			tmp[r] = '\0';
 			c = atoi(tmp);
-			b->l = insert_head(b->l, (void*)c);
+			bigInt->list = insert_head(bigInt->list, c);
 		}
 	}
 
-	return b;
+	return bigInt;
 }
 
 /* Debug */
-void printBigInteger(BigInteger b)
+void printBigInteger(BigInteger input)
 {
     Element *current = NULL;
     int i = 0;
 
-    if(is_empty(b) || is_empty(b->l))
+    if(is_empty(input) || is_empty(input->list))
         printf("The Big-Integer is empty!\n");
     else
     {
-        if(b->sign == -1)
+        if(input->sign == -1)
             printf("-");
-        current = b->l->head;
-        for(i = b->l->length; i > 0; i = i - 1)
+        current = input->list->head;
+        for(i = input->list->length; i > 0; i = i - 1)
         {
-            printf("%.4d ", current->d);
+            printf("%.4d ", current->key);
             current = current->next;
         }
         printf("\n");
