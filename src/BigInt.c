@@ -745,12 +745,12 @@ void printBigInteger(BigInteger input)
     }
 }
 
-void printArrayInt(int* input, int n)
+void printNumber(Number input)
 {
 	int i = 0;
 	
-	for(i = 0; i < n; i = i + 1)
-		printf("%d", input[i]);
+	for(i = 0; i < DIVISORRADIX + 1; i = i + 1)
+		printf("%d", input.number[i]);
 	printf("\n");
 }
 

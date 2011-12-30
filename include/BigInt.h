@@ -67,7 +67,7 @@ BigInteger divBigInt(BigInteger, BigInteger);
 BigInteger newBigInteger(char* str);
 /* Debug */
 void printBigInteger(BigInteger);
-void printArrayInt(int*, int);
+void printNumber(Number);
 
 #endif /* DEF_BIGINT */
 
