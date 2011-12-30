@@ -50,7 +50,7 @@ BigInteger sumBigInt(BigInteger, BigInteger);
 BigInteger diffBigInt(BigInteger, BigInteger);
 BigInteger mulBigInt(BigInteger, BigInteger);
 /* Groups of functions for the division */
-float value(Number, int);
+Number value(int);
 int length(Number, int);
 Number product(Number, int);
 Number quotient(Number, int);

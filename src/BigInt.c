@@ -391,16 +391,6 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 	return mul;
 }
 /* Groups of functions for the division */
-function value(x: integer): number;
-var y: number; i: integer;
-begin
-for i := 0 to w do
-begin
-y[i] := x mod b;
-x := x div b
-end;
-value := y
-end;
 
 Number value(int x)
 {
@@ -418,7 +408,7 @@ Number value(int x)
 	
 int length(Number input)
 {
-	int i = n, j = 0;
+	int i = DIVISORRADIX, j = 0;
 	
 	while(i != j)
 	{
@@ -436,13 +426,13 @@ Number product(Number input, int k)
 	int i = 0, m = 0, carry = 0, temp = 0;
 	
 	m = length(input);
-	for(i = 0; i < m + 1; i = i + 1)
+	for(i = 0; i <= m - 1; i = i + 1)
 	{
 		temp = input.number[i] * k + carry;
 		input.number[i] = temp % DIVIDENDRADIX;
 		carry = temp / DIVIDENDRADIX;
 	}
-	if(m <= n)
+	if(m <= DIVISORRADIX)
 		input.number[m] = carry;
 	else
 		carry = 0;
@@ -455,7 +445,7 @@ Number quotient(Number input, int k)
 	int i = 0, m = 0, carry = 0, temp = 0;
 	
 	m = length(input);
-	for(i = m; i == 0; i = i - 1)
+	for(i = m - 1; i >= 0; i = i - 1)
 	{
 		temp = carry * DIVIDENDRADIX + input.number[i];
 		input.number[i] = temp / k;
@@ -469,10 +459,10 @@ Number remainder(Number input, int k)
 	int i = 0, m = 0, carry = 0;
 	
 	m = length(input);
-	for(i = m; i == 0; i = i - 1)
+	for(i = m - 1; i >= 0; i = i - 1)
 		carry = (carry * DIVIDENDRADIX + input.number[i]) % k;
 	
-	return toIntArray(carry);
+	return value(carry);
 }
 
 int trial_digit(Number r, Number d, int k, int m)
@@ -483,7 +473,7 @@ int trial_digit(Number r, Number d, int k, int m)
 	km = k + m;
 	r3 = (r.number[km] * DIVIDENDRADIX + r.number[km-1]) * DIVIDENDRADIX + r.number[km-2];
 	d2 = d.number[m-1] * DIVIDENDRADIX + d.number[m-2];
-	temp = r3 / d2;
+	temp = (d2 == 0) ? 0 : r3 / d2;
 	
 	return (temp <= DIVIDENDRADIX - 1) ? temp : DIVIDENDRADIX - 1;
 }
@@ -501,14 +491,14 @@ Boolean smaller(Number r, Number dq, int k, int m)
 			i = i - 1;
 	}
 	
-	return (r[i+k] < dq[i]);
+	return (r[i+k] < dq[i]) ? TRUE : FALSE;
 }
 
 Number difference(Number r, Number dq, int k, int m)
 {
 	int borrow = 0, diff = 0, i = 0;
 	
-	for(i = 0; i < m + 1; i = i + 1)
+	for(i = 0; i <= m; i = i + 1)
 	{
 		diff = r.number[i+k] - dq.number[i] - borrow + DIVIDENDRADIX;
 		r.number[i+k] = diff % DIVIDENDRADIX;
@@ -528,10 +518,10 @@ Number long_div(Number x, Number y, int n, int m)
 	r = product(x, f);
 	d = product(y, f);
 	q = value(0);
-	for(k = n - m; k == 0; k = k - 1)
+	for(k = n - m; k >= 0; k = k - 1)
 	{
 		qt = trial_digit(r, d, k, m);
-		qd = product(d, qt);
+		dq = product(d, qt);
 		if(smaller(r, dq, k, m))
 		{
 			qt = qt - 1;
@@ -553,7 +543,7 @@ Number long_mod(Number x, Number y, int n, int m)
 	f = DIVIDENDRADIX / (y.number[m-1] + 1);
 	r = product(x, f);
 	d = product(y, f);
-	for(k = n - m; k == 0; k = k - 1)
+	for(k = n - m; k >= 0; k = k - 1)
 	{
 		/* Assuming 2 <= m <= k+m <= n <= w */
 		qt = trial_digit(r, d, k, m);
@@ -606,7 +596,13 @@ Number modulo(Number x, Number y)
 		r = remainder(x, y1);
 	}
 	else
-		r = long_mod(x, y, n, m);
+	{
+		n = length(x);
+		if(m > n)
+			r = x;
+		else
+			r = long_mod(x, y, n, m);
+	}
 	
 	return r;
 }
