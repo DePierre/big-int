@@ -15,6 +15,9 @@
 #define NBDIGITS 4 /* Number of digits by each element */
 /* Each number can't be greater than 10,00 */
 #define NBDIGITSPOW (int)power(10, NBDIGITS)
+/* Definition of the two radix needed to the division */
+#define DIVIDENDRADIX NBDIGITSPOW
+#define DIVISORRADIX NBDIGITSPOW / 10
 
 /* Record of a big integer */
 typedef struct
@@ -24,6 +27,11 @@ typedef struct
 } Struct_big_integer;
 
 typedef Struct_big_integer* BigInteger;
+
+typedef struct
+{
+	int number[DIVISORRADIX + 1];
+} Number;
 
 /* Creator & destructor */
 BigInteger create_big_int(void);
@@ -36,15 +44,30 @@ Boolean isNull(BigInteger);
 int signBigInt(BigInteger);
 Boolean equalsBigInt(BigInteger, BigInteger);
 int compareBigInt(BigInteger, BigInteger);
+int* toIntArray(BigInteger);
 /* Arithmetic methods */
 BigInteger sumBigInt(BigInteger, BigInteger);
 BigInteger diffBigInt(BigInteger, BigInteger);
 BigInteger mulBigInt(BigInteger, BigInteger);
+/* Groups of functions for the division */
+float value(Number, int);
+int length(Number, int);
+Number product(Number, int);
+Number quotient(Number, int);
+Number remainder(Number, int);
+int trial_digit(Number, Number, int, int);
+Boolean smaller(Number, Number, int, int);
+Number difference(Number, Number, int, int);
+Number long_div(Number, Number, int, int);
+Number long_mod(Number, Number, int, int);
+Number divide(Number, Number);
+Number modulo(Number, Number);
 BigInteger divBigInt(BigInteger, BigInteger);
 /* Modifiers */
 BigInteger newBigInteger(char* str);
 /* Debug */
 void printBigInteger(BigInteger);
+void printArrayInt(int*, int);
 
 #endif /* DEF_BIGINT */
 

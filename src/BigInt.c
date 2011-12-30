@@ -188,6 +188,33 @@ int compareBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 	return 0;
 }
 
+int* toIntArray(BigInteger input)
+{
+	int i = 0;
+	int **bigIntStr = NULL;
+	Elemt *current = NULL;
+	
+	if(!isNull(input))
+	{
+		*bigIntStr = calloc(input->list->length, sizeof(char*));
+		if(bigIntStr != NULL)
+		{
+			current = input->list->tail;
+			for(i = input->list->length; i > 0; i = i - 4)
+			{
+				*bigIntStr[i] = current->data % NBDIGITSPOW;
+				*bigIntStr[i-1] = current->data % (NBDIGITSPOW / 10);
+				*bigIntStr[i-2] = current->data % (NBDIGITSPOW / 100);
+				*bigIntStr[i-3] = current->data % (NBDIGITSPOW / 1000);
+				
+				current = current->prev;
+			}
+		}
+	}
+	
+	return *bigIntStr;
+}
+	
 /* Arithmetic methods */
 /*  Return: new big integer which is the sum of a and b
     Data: two big integers to sum
@@ -363,6 +390,226 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 
 	return mul;
 }
+/* Groups of functions for the division */
+function value(x: integer): number;
+var y: number; i: integer;
+begin
+for i := 0 to w do
+begin
+y[i] := x mod b;
+x := x div b
+end;
+value := y
+end;
+
+Number value(int x)
+{
+	Number y;
+	int i = 0;
+	
+	for(i = 0; i < DIVISORRADIX + 1; i = i + 1)
+	{
+		y.number[i] = x % DIVIDENDRADIX;
+		x = x / DIVIDENDRADIX;
+	}
+	
+	return y;
+}
+	
+int length(Number input)
+{
+	int i = n, j = 0;
+	
+	while(i != j)
+	{
+		if(input.number[i] != 0)
+			j = i;
+		else
+			i = i - 1;
+	}
+	
+	return i + 1;
+}
+
+Number product(Number input, int k)
+{
+	int i = 0, m = 0, carry = 0, temp = 0;
+	
+	m = length(input);
+	for(i = 0; i < m + 1; i = i + 1)
+	{
+		temp = input.number[i] * k + carry;
+		input.number[i] = temp % DIVIDENDRADIX;
+		carry = temp / DIVIDENDRADIX;
+	}
+	if(m <= n)
+		input.number[m] = carry;
+	else
+		carry = 0;
+	
+	return input;
+}
+
+Number quotient(Number input, int k)
+{
+	int i = 0, m = 0, carry = 0, temp = 0;
+	
+	m = length(input);
+	for(i = m; i == 0; i = i - 1)
+	{
+		temp = carry * DIVIDENDRADIX + input.number[i];
+		input.number[i] = temp / k;
+		carry = temp % k;
+	}
+	
+	return input;
+}
+Number remainder(Number input, int k)
+{
+	int i = 0, m = 0, carry = 0;
+	
+	m = length(input);
+	for(i = m; i == 0; i = i - 1)
+		carry = (carry * DIVIDENDRADIX + input.number[i]) % k;
+	
+	return toIntArray(carry);
+}
+
+int trial_digit(Number r, Number d, int k, int m)
+{
+	int d2 = 0, km = 0, r3 = 0, temp = 0;
+	
+	/* Assuming { 2 <= m <= k+m <= w } */
+	km = k + m;
+	r3 = (r.number[km] * DIVIDENDRADIX + r.number[km-1]) * DIVIDENDRADIX + r.number[km-2];
+	d2 = d.number[m-1] * DIVIDENDRADIX + d.number[m-2];
+	temp = r3 / d2;
+	
+	return (temp <= DIVIDENDRADIX - 1) ? temp : DIVIDENDRADIX - 1;
+}
+
+Boolean smaller(Number r, Number dq, int k, int m)
+{
+	int i = m, j = 0;
+	
+	/* Assuming { r[k+m..k] < dq[m..0] } */
+	while(i != j)
+	{
+		if(r.number[i+k] != dq.number[i])
+			j = i;
+		else
+			i = i - 1;
+	}
+	
+	return (r[i+k] < dq[i]);
+}
+
+Number difference(Number r, Number dq, int k, int m)
+{
+	int borrow = 0, diff = 0, i = 0;
+	
+	for(i = 0; i < m + 1; i = i + 1)
+	{
+		diff = r.number[i+k] - dq.number[i] - borrow + DIVIDENDRADIX;
+		r.number[i+k] = diff % DIVIDENDRADIX;
+		borrow = 1 - diff / DIVIDENDRADIX;
+	}
+	borrow = 0;
+	
+	return r;
+}
+
+Number long_div(Number x, Number y, int n, int m)
+{
+	Number d, dq, q, r;
+	int f, k ,qt;
+	
+	f = DIVIDENDRADIX / (y.number[m-1] + 1);
+	r = product(x, f);
+	d = product(y, f);
+	q = value(0);
+	for(k = n - m; k == 0; k = k - 1)
+	{
+		qt = trial_digit(r, d, k, m);
+		qd = product(d, qt);
+		if(smaller(r, dq, k, m))
+		{
+			qt = qt - 1;
+			dq = product(d, qt);
+		}
+		q.number[k] = qt;
+		r = difference(r, dq, k, m);
+	}
+	
+	return q;
+}
+
+Number long_mod(Number x, Number y, int n, int m)
+{
+	Number d, dq, r;
+	int f, k, qt;
+	
+	/* Assuming 2 <= m <= n <= w */
+	f = DIVIDENDRADIX / (y.number[m-1] + 1);
+	r = product(x, f);
+	d = product(y, f);
+	for(k = n - m; k == 0; k = k - 1)
+	{
+		/* Assuming 2 <= m <= k+m <= n <= w */
+		qt = trial_digit(r, d, k, m);
+		dq = product(d, qt);
+		if(smaller(r, dq, k, m))
+		{
+			qt = qt - 1;
+			dq = product(d, qt);
+		}
+		r = difference(r, dq, k, m);
+	}
+	
+	return quotient(r, f);
+}
+
+Number divide(Number x, Number y)
+{
+	int m, n, y1;
+	Number q;
+	
+	m = length(y);
+	if(m == 1)
+	{
+		y1 = y.number[m-1];
+		/* assume y1 > 0 */
+		q = quotient(x, y1);
+	}
+	else
+	{
+		n = length(x);
+		if(m > n)
+			q = value(0);
+		else
+			q = long_div(x, y, n, m);
+	}
+	
+	return q;
+}
+
+Number modulo(Number x, Number y)
+{
+	int m, n, y1;
+	Number r;
+	
+	m = length(y);
+	if(m == 1)
+	{
+		y1 = y.number[m-1];
+		/* assume y1 > 0 */
+		r = remainder(x, y1);
+	}
+	else
+		r = long_mod(x, y, n, m);
+	
+	return r;
+}
 
 BigInteger divBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 {
@@ -496,5 +743,14 @@ void printBigInteger(BigInteger input)
         }
         printf("\n");
     }
+}
+
+void printArrayInt(int* input, int n)
+{
+	int i = 0;
+	
+	for(i = 0; i < n; i = i + 1)
+		printf("%d", input[i]);
+	printf("\n");
 }
 
