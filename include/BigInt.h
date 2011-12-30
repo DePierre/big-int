@@ -17,7 +17,7 @@
 #define NBDIGITSPOW (int)power(10, NBDIGITS)
 /* Definition of the two radix needed to the division */
 #define DIVIDENDRADIX NBDIGITSPOW
-#define DIVISORRADIX NBDIGITSPOW / 10
+#define DIVISORRADIX 10
 
 /* Record of a big integer */
 typedef struct
