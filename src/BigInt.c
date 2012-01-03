@@ -66,6 +66,27 @@ int get_max_loops(BigInteger firstBigInt, BigInteger secondBigInt)
 	return maxLoops;
 }
 
+/*  Result: big integer without any zero at the left
+	Data: big integer which has to be processed
+	Process: travers the list from the end and delete each element if
+	it's equal to zero. Stop at the first occurence of a non-zero element */
+BigInteger delete_left_zero(BigInteger input)
+{
+	Element *current = NULL;
+	
+	if(!isNull(input) && !is_null(input->list))
+	{
+		current = input->list->tail;
+		while(current->key == 0 && current != input->list->head)
+		{
+			input->list = remove_tail(input_list);
+			current = input->list->tail;
+		}
+	}
+
+	return input;
+}
+
 /* Access methods */
 Boolean isNull(BigInteger input)
 {
@@ -274,7 +295,7 @@ BigInteger sumBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
     }
 
 
-    return sum;
+    return delete_left_zero(sum);
 }
 
 /*  Return: new big integer which is the diff of a and b
@@ -324,7 +345,7 @@ BigInteger diffBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 
     }
 
-    return diff;
+    return delete_left_zero(diff);
 }
 
 /*  Return: new big integer which is the mul of a and b
@@ -388,223 +409,274 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 		}
     }
 
-	return mul;
+	return delete_left_zero(mul);
 }
 /* Groups of functions for the division */
-
-Number value(int x)
+BigInteger product(BigInteger input, unsigned long k)
 {
-	Number y;
-	int i = 0;
+	BigInteger copy = NULL, unit = NULL;
 	
-	for(i = 0; i < DIVISORRADIX + 1; i = i + 1)
-	{
-		y.number[i] = x % DIVIDENDRADIX;
-		x = x / DIVIDENDRADIX;
-	}
+	copy = fromBigIntegerToBigInteger(input);
+	unit = fromUnsignedLongToBigInteger(k);
 	
-	return y;
-}
+	mulBigInt(copy, unit);
 	
-int length(Number input)
-{
-	int i = DIVISORRADIX, j = 0;
-	
-	while(i != j)
-	{
-		if(input.number[i] != 0)
-			j = i;
-		else
-			i = i - 1;
-	}
-	
-	return i + 1;
+	return copy;
 }
 
-Number product(Number input, int k)
+BigInteger quotient(BigInteger input, unsigned long k)
 {
-	int i = 0, m = 0, carry = 0, temp = 0;
+	int i = 0, j = 0, m = 0, carry = 0, temp = 0, currentDiv = 0, currentPow = 10;
+	BigInteger copy = NULL;
+	Element *current = NULL;
 	
-	m = length(input);
-	for(i = 0; i <= m - 1; i = i + 1)
+	if(!isNull(input) && !is_empty(input->list))
 	{
-		temp = input.number[i] * k + carry;
-		input.number[i] = temp % DIVIDENDRADIX;
-		carry = temp / DIVIDENDRADIX;
-	}
-	if(m <= DIVISORRADIX)
-		input.number[m] = carry;
-	else
-		carry = 0;
-	
-	return input;
-}
-
-Number quotient(Number input, int k)
-{
-	int i = 0, m = 0, carry = 0, temp = 0;
-	
-	m = length(input);
-	for(i = m - 1; i >= 0; i = i - 1)
-	{
-		temp = carry * DIVIDENDRADIX + input.number[i];
-		input.number[i] = temp / k;
-		carry = temp % k;
+		copy = fromBigIntegerToBigInteger(input);
+		
+		m = input->list->length;
+		current = copy->list->tail;
+		for(i = m - 1; i >= 0; i = i - 1)
+		{
+			currentDiv = 0;
+			currentPow = 10;
+			for(j = 0; j < 4; j = j + 1)
+			{
+				temp = carry * NBDIGITSPOW + current->key / currentPow;
+				currentDiv = currentDiv + temp / k;
+				carry = temp % k;
+				currentPow = currentPow * 10;
+			}
+			
+			copy->list = insert_tail(copy->list, currentDiv);
+			current = current->prev;
+		}
 	}
 	
-	return input;
+	return delete_left_zero(copy);
 }
-Number remainder(Number input, int k)
+BigInteger remainder(BigInteger input, unsigned long k)
 {
-	int i = 0, m = 0, carry = 0;
+	int i = 0, j = 0, m = 0, carry = 0, currentPow = 10;
+	BigInteger carry = NULL;
+	Element *current = NULL;
 	
-	m = length(input);
-	for(i = m - 1; i >= 0; i = i - 1)
-		carry = (carry * DIVIDENDRADIX + input.number[i]) % k;
+	carry = create_big_integer();
 	
-	return value(carry);
+	if(!isNull(carry) && !isNull(input) && !is_empty(input->list))
+	{
+		current = input->list->tail;
+		
+		m = input->list->length;
+		for(i = m - 1; i >= 0; i = i - 1)
+		{
+			carry = 0;
+			currentPow = 10;	
+			for(j = 0; j < 4; j = j + 1)
+				carry = carry + (carry * NBDIGITSPOW + current->key / currentPow) % k;		
+			current = current->prev;
+		}
+	}
+	
+	return fromUnsignedLongToBigInteger(carry);
 }
 
-int trial_digit(Number r, Number d, int k, int m)
+int trial_digit(BigInteger r, BigInteger d, int k, int m)
 {
 	int d2 = 0, km = 0, r3 = 0, temp = 0;
 	
-	/* Assuming { 2 <= m <= k+m <= w } */
-	km = k + m;
-	r3 = (r.number[km] * DIVIDENDRADIX + r.number[km-1]) * DIVIDENDRADIX + r.number[km-2];
-	d2 = d.number[m-1] * DIVIDENDRADIX + d.number[m-2];
-	temp = (d2 == 0) ? 0 : r3 / d2;
+	if(!isNull(r) && !isNull(d) && !is_empty(r->list) && !is_empty(d->list))
+	{
+		/* Assuming { 2 <= m <= k+m <= w } */
+		km = k + m;
+		r3 = ((r->list->valueOf(km / 4) / pow(10, km % 4)) * NBDIGITSPOW + (r->list->valueOf((km - 1) / 4) / pow(10, (km - 1) % 4))) * NBDIGITSPIW + (r->list->valueOf((km - 2) / 4) / pow(10, (km - 2) % 4));
+		d2 = (d->list->valueOf((m-1) / 4) / pow(10, (m-1) % 4)) * NBDIGITSPOW + (d->list->valueOf((m-2) / 4) / pow(10, (m-2) % 4))
+		temp = (d2 == 0) ? 0 : r3 / d2;
+	}
 	
-	return (temp <= DIVIDENDRADIX - 1) ? temp : DIVIDENDRADIX - 1;
+	return (temp <= NBDIGITSPOW - 1) ? temp : NBDIGITSPOW - 1;
 }
 
-Boolean smaller(Number r, Number dq, int k, int m)
+Boolean smaller(BigInteger r, BigInteger dq, int k, int m)
 {
 	int i = m, j = 0;
 	
-	/* Assuming { r[k+m..k] < dq[m..0] } */
-	while(i != j)
+	if(!isNull(r) && !isNull(dq) && !is_empty(r->list) && !is_empty(dq->list))
 	{
-		if(r.number[i+k] != dq.number[i])
-			j = i;
-		else
-			i = i - 1;
-	}
-	
-	return (r[i+k] < dq[i]) ? TRUE : FALSE;
-}
-
-Number difference(Number r, Number dq, int k, int m)
-{
-	int borrow = 0, diff = 0, i = 0;
-	
-	for(i = 0; i <= m; i = i + 1)
-	{
-		diff = r.number[i+k] - dq.number[i] - borrow + DIVIDENDRADIX;
-		r.number[i+k] = diff % DIVIDENDRADIX;
-		borrow = 1 - diff / DIVIDENDRADIX;
-	}
-	borrow = 0;
-	
-	return r;
-}
-
-Number long_div(Number x, Number y, int n, int m)
-{
-	Number d, dq, q, r;
-	int f, k ,qt;
-	
-	f = DIVIDENDRADIX / (y.number[m-1] + 1);
-	r = product(x, f);
-	d = product(y, f);
-	q = value(0);
-	for(k = n - m; k >= 0; k = k - 1)
-	{
-		qt = trial_digit(r, d, k, m);
-		dq = product(d, qt);
-		if(smaller(r, dq, k, m))
+		/* Assuming { r[k+m..k] < dq[m..0] } */
+		while(i != j)
 		{
-			qt = qt - 1;
-			dq = product(d, qt);
+			if((r->list->valueOf((i + k) / 4) / pow(10, (i + k) % 4)) != (dq->list->valueOf(i / 4) / pow(10, i % 4)))
+				j = i;
+			else
+				i = i - 1;
 		}
-		q.number[k] = qt;
-		r = difference(r, dq, k, m);
 	}
+	
+	return ((r->list->valueOf((i + k) / 4) / pow(10, (i + k) % 4)) < (dq->list->valueOf(i / 4) / pow(10, i % 4))) ? TRUE : FALSE;
+}
+
+BigInteger difference(BigInteger r, BigInteger dq, int k, int m)
+{
+	int borrow = 0, diff = 0, i = 0, j = 0;
+	BigInteger copyR = NULL;
+	Element *current = NULL;
+	
+	copyR = fromBigIntegerToBigInteger(r);
+	
+	if(!isNull(r) && !isNull(dq) && !is_empty(r->list) && !is_empty(dq->list))
+	{
+		for(i = 0; i <= m; i = i + 1)
+		{
+			current = copyR->list->head;
+			diff = r.number[i+k] - dq.number[i] - borrow + DIVIDENDRADIX;
+			diff = (copyR->list->valueOf((i + k) / 4) / pow(10, (i + k) % 4)) - (dq->list->valueOf(i / 4) / pow(10, i % 4)) - borrow + NBDIGITSPOW;
+			copyR->list = insert_of(copyR->list, diff % NBDIGITSPOW, i + k);
+			for(j = 0; j < (i + k) / 4; j = j + 1)
+				current = current->next;
+			current->key = diff % NBDIGITSPOW * pow(10, (i + k) % 4);
+			borrow = 1 - diff / NBDIGITSPOW;
+		}
+	}
+	
+	return copyR;
+}
+
+BigInteger long_div(BigInteger x, BigInteger y, int n, int m)
+{
+	int i = 0, f, k ,qt;
+	BigInteger d = NULL, dq = NULL, q = NULL, r = NULL;
+	Element *current = NULL;
+	
+	d = create_big_int();
+	dq = create_big_int();
+	q = create_big_int();
+	r = create_big_int();
+	
+	if(!isNull(x) && !isNull(y) && !isNull(d) && !isNull(dq) && !isNull(q) && !isNull(r) &&
+		!is_empty(x->list) && !is_empty(y->list))
+	{
+		f = NBDIGITSPOW / ((y->list->valueOf((m - 1) / 4) / pow(10, (m - 1) % 4)) + 1);
+		r = product(x, f);
+		d = product(y, f);
+		q = fromUnsignedLongToBigInteger(0);
+		for(k = n - m; k >= 0; k = k - 1)
+		{
+			qt = trial_digit(r, d, k, m);
+			dq = product(d, qt);
+			if(smaller(r, dq, k, m))
+			{
+				qt = qt - 1;
+				dq = product(d, qt);
+			}
+			current = q->list->head;
+			for(i = 0; i < k; i = i + 1)
+				current = current->next;
+			current->key = qt % NBDIGITSPOW * pow(10, k % 4);
+			r = difference(r, dq, k, m);
+		}
+	}
+	
+	delete_big_int(d);
+	delete_big_int(dq);
+	delete_big_int(dr);
 	
 	return q;
 }
 
-Number long_mod(Number x, Number y, int n, int m)
+BigInteger long_mod(BigInteger x, BigInteger y, int n, int m)
 {
-	Number d, dq, r;
+	BigInteger d = NULL, dq = NULL, r = NULL;
 	int f, k, qt;
 	
-	/* Assuming 2 <= m <= n <= w */
-	f = DIVIDENDRADIX / (y.number[m-1] + 1);
-	r = product(x, f);
-	d = product(y, f);
-	for(k = n - m; k >= 0; k = k - 1)
+	d = create_big_int();
+	dq = create_big_int();
+	r = create_big_int();
+	
+	if(!isNull(x) && !isNull(y) && !isNull(d) && !isNull(dq) && !isNull(r) &&
+		!is_empty(x->list) && !is_empty(y->list))
 	{
-		/* Assuming 2 <= m <= k+m <= n <= w */
-		qt = trial_digit(r, d, k, m);
-		dq = product(d, qt);
-		if(smaller(r, dq, k, m))
+		/* Assuming 2 <= m <= n <= w */
+		f = NBDIGITSPOW / ((y->list->valueOf((m - 1) / 4) / pow(10, (m - 1) % 4)) + 1);
+		r = product(x, f);
+		d = product(y, f);
+		for(k = n - m; k >= 0; k = k - 1)
 		{
-			qt = qt - 1;
+			/* Assuming 2 <= m <= k+m <= n <= w */
+			qt = trial_digit(r, d, k, m);
 			dq = product(d, qt);
+			if(smaller(r, dq, k, m))
+			{
+				qt = qt - 1;
+				dq = product(d, qt);
+			}
+			r = difference(r, dq, k, m);
 		}
-		r = difference(r, dq, k, m);
 	}
+	
+	delete_big_int(d);
+	delete_big_int(dq);
 	
 	return quotient(r, f);
 }
 
-Number divide(Number x, Number y)
+BigInteger divBigInt(BigInteger x, BigInteger y)
 {
 	int m, n, y1;
-	Number q;
+	BigInteger q = NULL;
 	
-	m = length(y);
-	if(m == 1)
+	q = create_big_int();
+	
+	if(!isNull(x) && !isNull(y) && !isNull(q) &&
+		!is_empty(x->list) && !is_empty(y->list))
 	{
-		y1 = y.number[m-1];
-		/* assume y1 > 0 */
-		q = quotient(x, y1);
-	}
-	else
-	{
-		n = length(x);
-		if(m > n)
-			q = value(0);
+		m = y->list->length;
+		if(m == 1 && (y->list->head->key / 10) == 0)
+		{
+			/* assume y1 > 0 */
+			q = quotient(x, y->list->head->key);
+		}
 		else
-			q = long_div(x, y, n, m);
+		{
+			n = x->list->length;
+			if(m > n)
+				q = fromUnsignedLongToBigInteger(0);
+			else
+				q = long_div(x, y, n, m);
+		}
 	}
 	
-	return q;
+	return delete_left_zero(q);
 }
 
-Number modulo(Number x, Number y)
+BigInteger restBigInt(BigInteger x, BigInteger y)
 {
 	int m, n, y1;
 	Number r;
+	BigInteger r = NULL;
 	
-	m = length(y);
-	if(m == 1)
+	r = create_big_int();
+	
+	if(!isNull(x) && !isNull(y) && !isNull(r) &&
+		!is_empty(x->list) && !is_empty(y->list))
 	{
-		y1 = y.number[m-1];
-		/* assume y1 > 0 */
-		r = remainder(x, y1);
-	}
-	else
-	{
-		n = length(x);
-		if(m > n)
-			r = x;
+		m = y->list->length;
+		if(m == 1 && (y->list->head->key / 10) == 0)
+		{
+			/* assume y1 > 0 */
+			r = remainder(x, y->list->head->key);
+		}
 		else
-			r = long_mod(x, y, n, m);
+		{
+			n = x->list->length;
+			if(m > n)
+				r = x;
+			else
+				r = long_mod(x, y, n, m);
+		}
 	}
 	
-	return r;
+	return delete_left_zero(r);
 }
 
 BigInteger divBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
@@ -667,7 +739,40 @@ BigInteger divBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 	return div;
 }
 
-/* Modifiers */
+BigInteger factorial(unsigned long input)
+{
+	unsigned long i = 0;
+	BigInteger bigIntFact = NULL, current = NULL, temp = NULL, unit = NULL;
+	Element* current = NULL;
+	
+	/* Special case */
+	/* 0! = 1! = 1 */
+	if(input == 0 || input == 1)
+		return newBigInt("1");
+		
+	current = fromUnsignedLongToBigInteger(input);
+	temp = diffBigInt(current, unit)
+	unit = newBigInt("1");
+	
+	if(!isNull(current) && !isNull(temp) && !isNull(unit))
+	{
+		while(signBigInt(temp) == 1) /* while n != 1 */
+		{
+			bigIntFact = mulBigInt(current, temp); /* fact = n * (n-1) */
+			current = diffBigInt(temp, unit); /* n <= n-1 */
+			temp = diffBigInt(current, unit); /* n-1 <= n-2 */
+		}
+	}
+	
+	return delete_left_zero(bigIntFact);
+}
+
+BigInteger cnp(unsigned long n, unsigned long p)
+{
+	return divBigInt(factorial(n), mulBigInt(factorial(n), factorial(n - p)));
+}
+
+/* Conversion */
 /*  Result: new big integer
 	Data: number as a string
 	Process: split the string into 4th characters parts */
@@ -716,7 +821,57 @@ BigInteger newBigInteger(char* str)
 		}
 	}
 
-	return bigInt;
+	return delete_left_zero(bigInt);
+}
+
+/*  Result: new big integer
+	Data: input as an unsigned long
+	Process: convert the input in big integer */
+BigInteger fromUnsignedLongToBigInteger(unsigned long input)
+{
+	int rest = 0, currentPow = basis;
+	BigInteger bigInt = NULL;
+	
+	bigInt = create_big_int();
+	if(!isNull(bigInt))
+	{
+		do
+		{
+			rest = input % NBDIGITSPOW;
+			input = input / NBDIGITSPOW;
+			
+			bigInt->list = insert_head(bigInt->list, rest);
+		}while(rest != 0);
+	}
+	
+	printBigInteger(bigInt);
+	return delete_left_zero(bigInt);
+}
+
+/*  Result: new big integer
+	Data: input as a big integer
+	Process: does a copy of input */
+BigInteger fromBigIntegerToBigInteger(BigInteger input)
+{
+	int i = 0;
+	BigInteger copy = create_big_int();
+	Element *current = NULL;
+	
+	if(!isNull(input) && !isNull(copy))
+	{
+		copy->sign = input->sign;
+		if(!is_empty(input->list))
+		{
+			current = input->list->head;
+			for(i = 0; i < input->list->length; i = i + 1)
+			{
+				copy->list = insert_tail(copy->list, current->key);
+				current = current->next;
+			}
+		}
+	}
+	
+	return delete_left_zero(copy);
 }
 
 /* Debug */
