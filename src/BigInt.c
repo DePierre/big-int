@@ -895,13 +895,3 @@ void printBigInteger(BigInteger input)
         printf("\n");
     }
 }
-
-void printNumber(Number input)
-{
-	int i = 0;
-	
-	for(i = 0; i < DIVISORRADIX + 1; i = i + 1)
-		printf("%d", input.number[i]);
-	printf("\n");
-}
-

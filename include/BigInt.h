@@ -15,9 +15,6 @@
 #define NBDIGITS 4 /* Number of digits by each element */
 /* Each number can't be greater than 10,00 */
 #define NBDIGITSPOW (int)power(10, NBDIGITS)
-/* Definition of the two radix needed to the division */
-#define DIVIDENDRADIX NBDIGITSPOW
-#define DIVISORRADIX 10
 
 /* Record of a big integer */
 typedef struct
@@ -27,11 +24,6 @@ typedef struct
 } Struct_big_integer;
 
 typedef Struct_big_integer* BigInteger;
-
-typedef struct
-{
-	int number[DIVISORRADIX + 1];
-} Number;
 
 /* Creator & destructor */
 BigInteger create_big_int(void);
@@ -71,7 +63,6 @@ BigInteger fromUnsignedLongToBigInteger(unsigned long);
 BigInteger fromBigIntegerToBigInteger(BigInteger);
 /* Debug */
 void printBigInteger(BigInteger);
-void printNumber(Number);
 
 #endif /* DEF_BIGINT */
 
