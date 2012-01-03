@@ -13,7 +13,7 @@
 #include <DList.h>
 
 #define NBDIGITS 4 /* Number of digits by each element */
-/* Each number can't be greater than 10,00 */
+/* Each number can't be greater than 1000 */
 #define NBDIGITSPOW (int)power(10, NBDIGITS)
 
 /* Record of a big integer */
@@ -42,21 +42,6 @@ int* toIntArray(BigInteger);
 BigInteger sumBigInt(BigInteger, BigInteger);
 BigInteger diffBigInt(BigInteger, BigInteger);
 BigInteger mulBigInt(BigInteger, BigInteger);
-/* Division */
-BigInteger product(BigInteger, unsigned long);
-BigInteger quotient(BigInteger, unsigned long);
-BigInteger remainder(BigInteger, unsigned long);
-int trial_digit(BigInteger, BigInteger, int, int);
-Boolean smaller(BigInteger, BigInteger, int, int);
-BigInteger difference(BigInteger, BigInteger, int, int);
-BigInteger long_div(BigInteger, BigInteger, int, int);
-BigInteger long_mod(BigInteger, BigInteger, int, int);
-BigInteger divBigInt(BigInteger, BigInteger);
-BigInteger restBigInt(BigInteger, BigInteger);
-/* End division*/
-/* Advanced arithmetic methods */
-BigInteger factorial(unsigned long);
-BigInteger cnp(unsigned long, unsigned long);
 /* Conversion */
 BigInteger newBigInteger(char*);
 BigInteger fromUnsignedLongToBigInteger(unsigned long);

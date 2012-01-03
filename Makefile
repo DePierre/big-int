@@ -30,4 +30,4 @@ $(LIB)/libBigInt.so: $(SRC)/BigInt.c
 	$(CXX) $(CCFLAGS) $(INCLUDEDIR) -o $@ -c $<
 
 clean:
-	rm -irf *.o src/*.o *~ src/*~ *.out
+	rm -irf *.o src/*.o *~ src/*~ lib/* *.out

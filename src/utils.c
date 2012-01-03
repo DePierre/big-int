@@ -12,9 +12,9 @@ Boolean is_empty(void* d)
 
 int power(int n, int p)
 {
-    int i = 0, current = n;
+    int i, current = n;
 
-    for(i = 0; i < p; i = i + 1)
+    for(i = 1; i < p; i = i + 1)
         current = current*n;
 
     return current;
