@@ -22,8 +22,8 @@ BigInteger create_big_int(void)
 
 	if(!is_null(bigInt))
 	{
-		bigInt->sign = 0;
-		bigInt->list = create_list();
+		bigInt->sign = 0; /* We initialize the sign */
+		bigInt->list = create_list(); /* and the list */
 		return bigInt;
 	}
 	return NULL;
@@ -79,12 +79,14 @@ BigInteger delete_left_zero(BigInteger input)
 
 	if(!isNull(input) && !is_null(input->list) && !is_empty(input->list))
 	{
+		/* We start from the most significant elements */
 	    current = input->list->tail;
-        if((input->list->length > 1))
+        if((input->list->length > 1)) /* The final list must contain at least one element */
         {
+			/* While we didn't find a key different from 0 and the current element is not the head */
             while(current->key == 0 && current != input->list->head)
             {
-                input->list = remove_tail(input->list);
+                input->list = remove_tail(input->list); /* We delete it */
                 current = input->list->tail;
             }
         }
@@ -307,8 +309,10 @@ BigInteger diffBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
             return diff;
         }
 
+		/* We define the sign of the result */
         diff->sign = compareBigInt(firstBigInt, secondBigInt);
 
+		/* We compute the minimum number of loop to reach the end of the smallest big integer */
         min = get_min_loops(firstBigInt, secondBigInt);
         max = get_max_loops(firstBigInt, secondBigInt);
 
@@ -316,38 +320,33 @@ BigInteger diffBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
         currentSecond = secondBigInt->list->head;
         for(i = 0; i < min; i = i + 1)
         {
-            flag = FALSE;
+            flag = FALSE; /* If the last computation was 0 - x */
+			/* If the current key if greater than the second */
             if(currentFirst->key >= currentSecond->key)
-            {
-                currentDiff = currentFirst->key - currentSecond->key;
-                if(currentDiff < 0)
-                    currentDiff = NBDIGITSPOW + currentDiff;
-            }
+                currentDiff = currentFirst->key - currentSecond->key; /* We diff the two keys */
             else
             {
                 if(currentFirst->key != 0)
-                {
                     currentDiff = currentSecond->key - currentFirst->key;
-                    if(currentDiff < 0)
-                        currentDiff = NBDIGITSPOW + currentDiff;
-                }
-                else
+                else /* Special case 0 - x */
                 {
                     currentDiff = 10000 - currentSecond->key;
                     flag = TRUE;
                 }
             }
+			/* We insert the current result */
             diff->list = insert_tail(diff->list, currentDiff);
 
             currentFirst = currentFirst->next;
             currentSecond = currentSecond->next;
 
-            if(flag)
+            if(flag) /* If we reach the special case 0 - x */
                 currentFirst->key = currentFirst->key - 1;
         }
         /* We save the position in the greatest big integer */
         rest = (i == firstBigInt->list->length) ? currentSecond : currentFirst;
-        for(i = min; i < max; i = i + 1)
+        /* We add the rest of the elements */
+		for(i = min; i < max; i = i + 1)
         {
             currentDiff = rest->key;
             rest = rest->next;
@@ -380,6 +379,7 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
         }
 		else
 		{
+			/* We define the sign of the result */
 		    if((firstBigInt->sign == 1 && secondBigInt->sign == 1) || (firstBigInt->sign == -1 && secondBigInt->sign == -1))
                 mul->sign = 1;
             else
@@ -387,6 +387,7 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 
 			if(!is_null(firstBigInt->list) && !is_null(secondBigInt->list))
 			{
+				/* We save the greatest and the lowest BigIntegers */
                 sign = compareBigInt(firstBigInt, secondBigInt);
                 if(sign == 1 || sign == 0)
                 {
@@ -403,10 +404,12 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 					return greatest;
 
 				currentGreatest = greatest->list->head;
+				/* For each element of the greatest BI */
 				for(i = 0; i < greatest->list->length; i = i + 1)
 				{
 					currentLowest = lowest->list->head;
 					currentMul = 0;
+					/* we multiply it by the elements of the greatest one */
 					for(j = 0; j < lowest->list->length; j = j + 1)
 					{
 						currentMul = currentMul + currentGreatest->key * currentLowest->key + carry;
@@ -418,6 +421,7 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 
 					currentGreatest = currentGreatest->next;
 				}
+				/* If there is a carry of the last computation */
                 if(carry != 0)
                     mul->list = insert_tail(mul->list, carry);
 			}
@@ -427,6 +431,9 @@ BigInteger mulBigInt(BigInteger firstBigInt, BigInteger secondBigInt)
 	return delete_left_zero(mul);
 }
 
+/*  Return: new big integer which is the factorial of a
+    Data: a the number
+    Process: compute the factorial */
 BigInteger factorial(unsigned long input)
 {
     BigInteger number = NULL, res = NULL, count = NULL;
@@ -434,9 +441,10 @@ BigInteger factorial(unsigned long input)
     res = fromUnsignedLongToBigInteger(1);
     count = fromUnsignedLongToBigInteger(1);
 
+	/* Special cases: 0! = 1 and 1! = 1 */
     if(input == 0 || input == 1)
         return delete_left_zero(fromUnsignedLongToBigInteger(1));
-
+	/* n! = n*(n-1)! <=> n*(n-1)*(n-2)! <=> n*(n-1)*…*1 */
     if(!isNull(number) && !isNull(res) && !isNull(count))
     {
         for(;compareBigInt(count, number); count = sumBigInt(count, fromUnsignedLongToBigInteger(1)))
@@ -582,6 +590,7 @@ void printBigInteger(BigInteger input)
         if(input->sign == -1)
             printf("-");
         current = input->list->tail;
+		/* The most significant element is not necessary composed of 4 digits */
         printf("%d ", current->key);
 
         current = current->prev;

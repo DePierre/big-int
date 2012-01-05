@@ -1,3 +1,8 @@
+/*  SAUVAGE Tao
+    27/10/11
+    Main
+*/
+
 #ifndef MAIN_H_INCLUDED
 #define MAIN_H_INCLUDED
 
