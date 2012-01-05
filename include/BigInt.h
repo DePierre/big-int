@@ -37,11 +37,12 @@ Boolean isNull(BigInteger);
 int signBigInt(BigInteger);
 Boolean equalsBigInt(BigInteger, BigInteger);
 int compareBigInt(BigInteger, BigInteger);
-int* toIntArray(BigInteger);
 /* Arithmetic methods */
 BigInteger sumBigInt(BigInteger, BigInteger);
 BigInteger diffBigInt(BigInteger, BigInteger);
 BigInteger mulBigInt(BigInteger, BigInteger);
+BigInteger quotientBigInt(BigInteger, BigInteger);
+BigInteger factorial(unsigned long);
 /* Conversion */
 BigInteger newBigInteger(char*);
 BigInteger fromUnsignedLongToBigInteger(unsigned long);

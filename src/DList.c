@@ -18,7 +18,7 @@ DList create_list(void)
 	DList list = NULL;
 	list = (DList) calloc(1, sizeof(Struct_dlist));
 
-	if(!is_empty(list)) /* If the allocation succeeded */
+	if(!is_null(list)) /* If the allocation succeeded */
 	{
 		list->head = NULL;
 		list->tail = NULL;
@@ -36,11 +36,11 @@ void delete_list(DList input)
 	Element* current = NULL;
 	Element* parent = NULL;
 
-	if(!is_empty(input))
+	if(!is_null(input))
 	{
 		current = input->head;
 		/* While we haven't reached the end of the list */
-		while(!is_empty(current))
+		while(!is_null(current))
 		{
 			parent = current; /* We save the current element into the buffer */
 			current = current->next; /* We switch to the next element */
@@ -53,6 +53,18 @@ void delete_list(DList input)
 }
 
 /* Access methods */
+Boolean is_null(void* input)
+{
+	return (input == NULL) ? TRUE : FALSE;
+}
+
+Boolean is_empty(DList input)
+{
+	if(!is_null(input))
+        return (input->length == 0) ? TRUE : FALSE;
+    return FALSE;
+}
+
 /*  Result: data of the n-th element of the list
 	Data: list to analyse
 		  index of the element that we are looking for
@@ -63,7 +75,7 @@ int value_of(DList input, unsigned int n)
 	unsigned int i = 1, k = 0;
 	Element* current = NULL;
 
-	if(!is_empty(input))
+	if(!is_null(input))
 	{
 		/* If n belongs to the interval [1, length] */
 		if(n > 1 && n < input->length)
@@ -106,7 +118,7 @@ int head_value(DList input)
 {
 	Element* current = NULL;
 
-	if(!is_empty(input))
+	if(!is_null(input))
 	{
 		current = input->head;
 		return current->key;
@@ -121,7 +133,7 @@ int tail_value(DList input)
 {
 	Element* current = NULL;
 
-	if(!is_empty(input))
+	if(!is_null(input))
 	{
 		current = input->tail;
 		return current->key;
@@ -135,7 +147,7 @@ int tail_value(DList input)
 	Process: Use the property of the list to return the length */
 unsigned int length_list(DList input)
 {
-	return (!is_empty(input)) ? input->length : 0;
+	return (!is_null(input)) ? input->length : 0;
 }
 
 /* Modifiers */
@@ -153,14 +165,14 @@ DList insert_of(DList input, int value, unsigned int n)
 	unsigned int i = 1, k = 0;
 
 	newElem = (Element*) calloc(1, sizeof(Element));
-	if(!is_empty(newElem))
+	if(!is_null(newElem))
 	{
 		newElem->next = NULL;
 		newElem->prev = NULL;
 		newElem->key = value;
 	}
 
-	if(is_empty(input))
+	if(is_null(input))
 	{
 		input->head = newElem;
 		input->tail = newElem;
@@ -219,9 +231,9 @@ DList insert_head(DList input, int value)
 	Element* newElem = NULL;
 	newElem = (Element*) calloc(1, sizeof(Element));
 
-    if(!is_empty(newElem))
+    if(!is_null(newElem))
     {
-        if(!is_empty(input))
+        if(!is_null(input))
         {
             if(input->length >= 1)
             {
@@ -256,14 +268,19 @@ DList insert_tail(DList input, int value)
 	Element* newElem = NULL;
 	newElem = (Element*) calloc(1, sizeof(Element));
 
-	if(!is_empty(newElem) && !is_empty(input))
+	if(!is_null(newElem) && !is_null(input))
 	{
-		newElem->next = NULL;
-		newElem->key = value;
-		input->tail->next = newElem;
-		newElem->prev = input->tail;
-		input->tail = newElem;
-		input->length = input->length + 1;
+	    if(!is_empty(input))
+	    {
+            newElem->next = NULL;
+            newElem->key = value;
+            input->tail->next = newElem;
+            newElem->prev = input->tail;
+            input->tail = newElem;
+            input->length = input->length + 1;
+	    }
+	    else
+            input = insert_head(input, value);
 
 		return input;
 	}
@@ -281,7 +298,7 @@ DList remove_of(DList input, unsigned int n)
 	Element* parent = NULL;
 	unsigned int i = 1, k = 0;
 
-	if(is_empty(input)) /* If the list is empty... */
+	if(is_null(input)) /* If the list is empty... */
 		return create_list(); /* We return a new list */
 	else
 	{
@@ -332,17 +349,25 @@ DList remove_head(DList input)
 {
 	Element* current = NULL;
 
-	if(!is_empty(input))
+	if(!is_null(input))
 	{
-		current = input->head;
-		/* New head is the next element of the previous last head of the list */
-		input->head = input->head->next;
-		free(current); /* We free the element */
-		current = NULL;
-		/* Previous element of the new head is nothing (i.e NULL) */
-		input->head->prev = NULL;
-		input->length = input->length - 1; /* The list has one element less */
-	}
+	    if(input->length > 1)
+	    {
+            current = input->head;
+            /* New head is the next element of the previous last head of the list */
+            input->head = input->head->next;
+            free(current); /* We free the element */
+            current = NULL;
+            /* Previous element of the new head is nothing (i.e NULL) */
+            input->head->prev = NULL;
+            input->length = input->length - 1; /* The list has one element less */
+	    }
+	    else
+        {
+            delete_list(input);
+            return NULL;
+        }
+    }
 	return input;
 }
 
@@ -353,7 +378,7 @@ DList remove_tail(DList input)
 {
 	Element* current = NULL;
 
-	if(!is_empty(input))
+	if(!is_null(input))
 	{
 		current = input->tail;
 		/* New tail is the previous element of the previous last element of the list */

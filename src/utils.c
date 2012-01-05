@@ -5,11 +5,6 @@
 
 #include <utils.h>
 
-Boolean is_empty(void* d)
-{
-	return (d == NULL) ? TRUE : FALSE;
-}
-
 int power(int n, int p)
 {
     int i, current = n;
@@ -20,3 +15,10 @@ int power(int n, int p)
     return current;
 }
 
+void clean_stdin()
+{
+    char c;
+
+    /* while c = '\n' and c = '\r' */
+    while (scanf("%c",&c)==1 && c!=10 && c!=13);
+}

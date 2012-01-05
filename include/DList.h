@@ -32,6 +32,8 @@ typedef Struct_dlist* DList;
 DList create_list(void);
 void delete_list(DList);
 /* Access methods */
+Boolean is_null(void*);
+Boolean is_empty(DList);
 int value_of(DList, unsigned int);
 int head_value(DList);
 int tail_value(DList);

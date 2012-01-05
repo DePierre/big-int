@@ -8,9 +8,9 @@ INCLUDEDIR= -I. -I$(INCLUDE) -I$(SRC)
 LIB= ./lib
 LIBDIR= -L$(LIB)
 
-TARGET= test.out
+TARGET= main.out
 
-SOURCES= $(SRC)/utils test
+SOURCES= $(SRC)/utils main
 OBJECTSFILES= $(SOURCES:=.o)
 
 all: $(TARGET)
