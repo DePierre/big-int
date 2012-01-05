@@ -52,7 +52,7 @@ int main(void)
                 break;
             case 7:
                 printf("Enter the number :\t");
-                scanf("%ld", &fact);
+                scanf("%lu", &fact);
                 res = factorial(fact);
                 printf("(%ld)! = ", fact);
                 printBigInteger(res);

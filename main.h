@@ -11,4 +11,5 @@
 int display_menu();
 char* new_str_of_big_int(int);
 
-#endif // MAIN_H_INCLUDED
+#endif /* MAIN_H_INCLUDED */
+
